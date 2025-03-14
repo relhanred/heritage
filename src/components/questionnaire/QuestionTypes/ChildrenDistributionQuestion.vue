@@ -1,10 +1,10 @@
-// Modification du ChildrenDistributionQuestion.vue pour mieux gérer les valeurs
+// src/components/questionnaire/QuestionTypes/ChildrenDistributionQuestion.vue
 
 <template>
   <div class="space-y-4">
     <div>
       <label :for="labelPrefix + '-sons-count'" class="block text-sm font-medium text-gray-700 mb-1">
-        Nombre de {{ sonsLabel }}
+        Nombre {{ startsWithVowel(sonsLabel) ? "d'" : "de " }}{{ sonsLabel }}
       </label>
       <input
           type="number"
@@ -18,7 +18,7 @@
     </div>
     <div>
       <label :for="labelPrefix + '-daughters-count'" class="block text-sm font-medium text-gray-700 mb-1">
-        Nombre de {{ daughtersLabel }}
+        Nombre {{ startsWithVowel(daughtersLabel) ? "d'" : "de " }}{{ daughtersLabel }}
       </label>
       <input
           type="number"
@@ -69,6 +69,13 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'update:validationError']);
 
 const validationError = ref('');
+
+// Fonction pour vérifier si un mot commence par une voyelle
+const startsWithVowel = (word) => {
+  if (!word || word.length === 0) return false;
+  const firstChar = word.charAt(0).toLowerCase();
+  return ['a', 'e', 'i', 'o', 'u', 'é', 'è', 'ê', 'à', 'â', 'î', 'ï', 'ô', 'œ', 'û', 'ù'].includes(firstChar);
+};
 
 // Assurez-vous que le modelValue a les bonnes clés lors de l'initialisation
 onMounted(() => {
