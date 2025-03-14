@@ -272,28 +272,7 @@ export const questionTree = {
             'Veuillez indiquer le nombre d\'arrière-petits-enfants issus des petits-fils décédés de la défunte :',
         type: 'great_grandchildren_distribution',
         next: (answer, allAnswers) => {
-            // Logique de navigation basée sur la présence d'arrière-petits-enfants
-            const totalGreatGrandsons = parseInt(answer.greatGrandsons) || 0;
-            const totalGreatGranddaughters = parseInt(answer.greatGranddaughters) || 0;
-
-            if (totalGreatGrandsons > 0 || totalGreatGranddaughters > 0) {
-                return 'has_great_grandchildren';
-            } else {
-                // Redirection en fonction des autres membres présents
-                if (allAnswers.children_count && allAnswers.deceased_sons_children) {
-                    const hasDaughters = allAnswers.children_count.daughters > 0;
-                    const hasGranddaughters = allAnswers.deceased_sons_children.granddaughters > 0;
-
-                    if (hasDaughters && hasGranddaughters) {
-                        return 'daughters_and_granddaughters';
-                    } else if (hasDaughters) {
-                        return 'only_daughters';
-                    } else if (hasGranddaughters) {
-                        return 'only_granddaughters';
-                    }
-                }
-                return 'end';
-            }
+            return 'has_muslim_ascendants';
         }
     },
     // Affichage d'une information lorsque des arrière-petits-enfants sont présents
