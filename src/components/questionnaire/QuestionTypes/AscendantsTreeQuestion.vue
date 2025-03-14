@@ -144,7 +144,7 @@
       </div>
       <div class="legend-item">
         <div class="legend-color non-clickable"></div>
-        <span>Ascendants ne pouvant pas hériter selon les règles islamiques</span>
+        <span>Ascendants ne pouvant pas hériter</span>
       </div>
     </div>
   </div>
