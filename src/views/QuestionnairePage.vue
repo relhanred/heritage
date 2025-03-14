@@ -55,6 +55,8 @@
               :modelValue="greatGrandchildrenDistribution"
               @update:modelValue="greatGrandchildrenDistribution = $event"
               labelPrefix="great-grandchildren"
+              sonsKey="greatGrandsons"
+              daughtersKey="greatGranddaughters"
               sonsLabel="arrière-petits-fils"
               daughtersLabel="arrière-petites-filles"
               @update:validationError="greatGrandchildrenValidationError = $event"

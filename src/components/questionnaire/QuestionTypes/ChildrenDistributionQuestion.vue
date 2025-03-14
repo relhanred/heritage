@@ -75,12 +75,12 @@ onMounted(() => {
   // Vérifier que les clés attendues existent dans modelValue
   const updatedModel = { ...props.modelValue };
 
-  if (updatedModel[props.sonsKey] === undefined) {
-    updatedModel[props.sonsKey] = '';
+  if (typeof updatedModel[props.sonsKey] !== 'string') {
+    updatedModel[props.sonsKey] = updatedModel[props.sonsKey]?.toString() || '';
   }
 
-  if (updatedModel[props.daughtersKey] === undefined) {
-    updatedModel[props.daughtersKey] = '';
+  if (typeof updatedModel[props.daughtersKey] !== 'string') {
+    updatedModel[props.daughtersKey] = updatedModel[props.daughtersKey]?.toString() || '';
   }
 
   emit('update:modelValue', updatedModel);
