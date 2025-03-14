@@ -1,4 +1,5 @@
-// src/components/questionnaire/QuestionTypes/ChildrenDistributionQuestion.vue
+// Modification du ChildrenDistributionQuestion.vue pour mieux gérer les valeurs
+
 <template>
   <div class="space-y-4">
     <div>
@@ -8,7 +9,7 @@
       <input
           type="number"
           :id="labelPrefix + '-sons-count'"
-          :value="modelValue.sons"
+          :value="modelValue[sonsKey]"
           @input="updateSons($event.target.value)"
           min="0"
           class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500"
@@ -22,7 +23,7 @@
       <input
           type="number"
           :id="labelPrefix + '-daughters-count'"
-          :value="modelValue.daughters"
+          :value="modelValue[daughtersKey]"
           @input="updateDaughters($event.target.value)"
           min="0"
           class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500"
@@ -36,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -69,25 +70,41 @@ const emit = defineEmits(['update:modelValue', 'update:validationError']);
 
 const validationError = ref('');
 
+// Assurez-vous que le modelValue a les bonnes clés lors de l'initialisation
+onMounted(() => {
+  // Vérifier que les clés attendues existent dans modelValue
+  const updatedModel = { ...props.modelValue };
+
+  if (updatedModel[props.sonsKey] === undefined) {
+    updatedModel[props.sonsKey] = '';
+  }
+
+  if (updatedModel[props.daughtersKey] === undefined) {
+    updatedModel[props.daughtersKey] = '';
+  }
+
+  emit('update:modelValue', updatedModel);
+});
+
 const updateSons = (value) => {
-  emit('update:modelValue', {
-    ...props.modelValue,
-    sons: value
-  });
-  validateInput(value, props.modelValue.daughters);
+  const updatedModel = { ...props.modelValue };
+  updatedModel[props.sonsKey] = value;
+
+  emit('update:modelValue', updatedModel);
+  validateInput(value, props.modelValue[props.daughtersKey]);
 };
 
 const updateDaughters = (value) => {
-  emit('update:modelValue', {
-    ...props.modelValue,
-    daughters: value
-  });
-  validateInput(props.modelValue.sons, value);
+  const updatedModel = { ...props.modelValue };
+  updatedModel[props.daughtersKey] = value;
+
+  emit('update:modelValue', updatedModel);
+  validateInput(props.modelValue[props.sonsKey], value);
 };
 
 // Watch for changes in modelValue to validate
 watch(() => props.modelValue, (newValue) => {
-  validateInput(newValue.sons, newValue.daughters);
+  validateInput(newValue[props.sonsKey], newValue[props.daughtersKey]);
 }, { deep: true });
 
 const validateInput = (sons, daughters) => {

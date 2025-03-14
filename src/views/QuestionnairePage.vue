@@ -181,27 +181,36 @@ onMounted(() => {
   loadSavedAnswer();
 });
 
-// Charger une réponse existante
 const loadSavedAnswer = () => {
   const savedAnswer = questionnaireStore.answers[currentQuestion.value.id];
 
   if (currentQuestion.value.type === 'children_distribution') {
     if (savedAnswer) {
-      childrenDistribution.value = { ...savedAnswer };
+      childrenDistribution.value = {
+        sons: savedAnswer.sons?.toString() || '',
+        daughters: savedAnswer.daughters?.toString() || ''
+      };
     } else {
       childrenDistribution.value = { sons: '', daughters: '' };
     }
   }
   else if (currentQuestion.value.type === 'grandchildren_distribution') {
     if (savedAnswer) {
-      grandchildrenDistribution.value = { ...savedAnswer };
+      // Conversion explicite en chaînes pour assurer la compatibilité avec les inputs
+      grandchildrenDistribution.value = {
+        grandsons: savedAnswer.grandsons?.toString() || '',
+        granddaughters: savedAnswer.granddaughters?.toString() || ''
+      };
     } else {
       grandchildrenDistribution.value = { grandsons: '', granddaughters: '' };
     }
   }
   else if (currentQuestion.value.type === 'great_grandchildren_distribution') {
     if (savedAnswer) {
-      greatGrandchildrenDistribution.value = { ...savedAnswer };
+      greatGrandchildrenDistribution.value = {
+        greatGrandsons: savedAnswer.greatGrandsons?.toString() || '',
+        greatGranddaughters: savedAnswer.greatGranddaughters?.toString() || ''
+      };
     } else {
       greatGrandchildrenDistribution.value = { greatGrandsons: '', greatGranddaughters: '' };
     }
@@ -222,6 +231,37 @@ const loadSavedAnswer = () => {
     currentAnswer.value = savedAnswer;
   } else {
     currentAnswer.value = null;
+  }
+};
+
+// 2. Assurez-vous que la fonction saveCurrentAnswer() fonctionne correctement
+const saveCurrentAnswer = () => {
+  if (currentQuestion.value.type === 'children_distribution') {
+    questionnaireStore.saveAnswer(currentQuestion.value.id, {
+      sons: parseInt(childrenDistribution.value.sons) || 0,
+      daughters: parseInt(childrenDistribution.value.daughters) || 0
+    });
+  }
+  else if (currentQuestion.value.type === 'grandchildren_distribution') {
+    // S'assurer que les valeurs sont converties en nombres pour stockage
+    questionnaireStore.saveAnswer(currentQuestion.value.id, {
+      grandsons: parseInt(grandchildrenDistribution.value.grandsons) || 0,
+      granddaughters: parseInt(grandchildrenDistribution.value.granddaughters) || 0
+    });
+  }
+  else if (currentQuestion.value.type === 'great_grandchildren_distribution') {
+    questionnaireStore.saveAnswer(currentQuestion.value.id, {
+      greatGrandsons: parseInt(greatGrandchildrenDistribution.value.greatGrandsons) || 0,
+      greatGranddaughters: parseInt(greatGrandchildrenDistribution.value.greatGranddaughters) || 0
+    });
+  }
+  else if (currentQuestion.value.type === 'ascendants_tree') {
+    // Sauvegarder les sélections d'ascendants
+    questionnaireStore.saveAnswer(currentQuestion.value.id, ascendantsSelection.value);
+  }
+  else if (currentQuestion.value.type !== 'info') {
+    // Pour les autres types de questions (sauf info)
+    questionnaireStore.saveAnswer(currentQuestion.value.id, currentAnswer.value);
   }
 };
 
@@ -268,35 +308,6 @@ const getCurrentAnswerValue = () => {
   }
 };
 
-// Sauvegarder la réponse actuelle
-const saveCurrentAnswer = () => {
-  if (currentQuestion.value.type === 'children_distribution') {
-    questionnaireStore.saveAnswer(currentQuestion.value.id, {
-      sons: parseInt(childrenDistribution.value.sons) || 0,
-      daughters: parseInt(childrenDistribution.value.daughters) || 0
-    });
-  }
-  else if (currentQuestion.value.type === 'grandchildren_distribution') {
-    questionnaireStore.saveAnswer(currentQuestion.value.id, {
-      grandsons: parseInt(grandchildrenDistribution.value.grandsons) || 0,
-      granddaughters: parseInt(grandchildrenDistribution.value.granddaughters) || 0
-    });
-  }
-  else if (currentQuestion.value.type === 'great_grandchildren_distribution') {
-    questionnaireStore.saveAnswer(currentQuestion.value.id, {
-      greatGrandsons: parseInt(greatGrandchildrenDistribution.value.greatGrandsons) || 0,
-      greatGranddaughters: parseInt(greatGrandchildrenDistribution.value.greatGranddaughters) || 0
-    });
-  }
-  else if (currentQuestion.value.type === 'ascendants_tree') {
-    // Sauvegarder les sélections d'ascendants
-    questionnaireStore.saveAnswer(currentQuestion.value.id, ascendantsSelection.value);
-  }
-  else if (currentQuestion.value.type !== 'info') {
-    // Pour les autres types de questions (sauf info)
-    questionnaireStore.saveAnswer(currentQuestion.value.id, currentAnswer.value);
-  }
-};
 
 // Réinitialiser les réponses pour une nouvelle question
 const resetAnswers = () => {
