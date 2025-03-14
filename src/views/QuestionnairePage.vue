@@ -4,15 +4,6 @@
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
       <div class="p-8">
         <div class="flex items-center mb-6">
-          <button
-              @click="goBack"
-              class="mr-2 text-gray-500 hover:text-gray-700"
-              aria-label="Retour"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
           <h1 class="text-xl font-semibold text-gray-900 flex-grow text-center">Questionnaire d'héritage</h1>
         </div>
 
@@ -84,7 +75,7 @@
         </QuestionContainer>
 
         <!-- Actions -->
-        <div class="flex justify-between">
+        <div class="flex justify-between mt-6">
           <button
               type="button"
               @click="goBack"
