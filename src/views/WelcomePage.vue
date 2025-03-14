@@ -9,15 +9,9 @@
 
         <div class="mb-8 text-center">
           <div class="mb-8 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="size-24 mx-auto mb-4">
-              <path d="M6 12H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <path d="M6 8h12"></path>
-              <path d="M18.3 17.7 20 16l-3-3-3 3 1.7 1.7"></path>
-              <path d="m12.3 17.7 2-1.7-3-3-3 3 2 1.7"></path>
-              <path d="M6.3 17.7 8 16l-3-3-3 3 1.7 1.7"></path>
-              <path d="m12 16 2 2 2-2"></path>
-              <path d="m6 16 2 2 2-2"></path>
-              <path d="m18 16 2 2 2-2"></path>
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-24 mx-auto mb-4 text-[#047857]" viewBox="0 0 16 16">
+              <path fill="currentColor" fill-rule="evenodd"
+                    d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5z"/>
             </svg>
           </div>
         </div>
@@ -25,9 +19,12 @@
         <div class="bg-teal-50 border-l-4 border-teal-500 p-4 mb-8 rounded-r">
           <p class="text-sm text-gray-700 leading-relaxed">
             Vous allez répondre à un questionnaire qui a pour but de déterminer la composition familiale précise du
-            défunt <span class="text-gray-600 italic">[qu'Allah lui accorde Sa miséricorde]</span>. Ce questionnaire ne pose
-            que les questions utiles, en tenant compte de vos réponses. Une synthèse de vos réponses nous parviendra ensuite
-            automatiquement. Après analyse par un connaisseur des règles d'héritage, un mail détaillé vous sera adressé pour
+            défunt <span class="text-gray-600 italic">[qu'Allah lui accorde Sa miséricorde]</span>. Ce questionnaire ne
+            pose
+            que les questions utiles, en tenant compte de vos réponses. Une synthèse de vos réponses nous parviendra
+            ensuite
+            automatiquement. Après analyse par un connaisseur des règles d'héritage, un mail détaillé vous sera adressé
+            pour
             vous permettre de répartir équitablement les biens du défunt selon les lois d'Allah.
           </p>
         </div>
@@ -64,15 +61,15 @@
     </div>
 
     <div class="text-center mt-6 text-sm text-gray-500">
-      <p>© {{ new Date().getFullYear() }} Calculateur d'Héritage</p>
+      <p>© {{ new Date().getFullYear() }} Questionnaire d'héritages</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useQuestionnaireStore } from '@/stores/questionnaire';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {useQuestionnaireStore} from '@/stores/questionnaire';
 
 const router = useRouter();
 const questionnaireStore = useQuestionnaireStore();
