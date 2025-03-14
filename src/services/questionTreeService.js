@@ -30,7 +30,7 @@ export const questionTree = {
     },
     wives_count: {
         id: 'wives_count',
-        text: 'Nombre d\'épouses non divorcées :',
+        text: 'Combien d\'épouses non divorcées le défunt avait-il ?',
         type: 'radio',
         options: [
             { value: 1, label: '1' },
@@ -65,7 +65,7 @@ export const questionTree = {
     },
     multiple_wives_pregnant: {
         id: 'multiple_wives_pregnant',
-        text: 'Au moins une des épouses était-elle enceinte ou en période de viduité ?',
+        text: 'Au moins une de ses épouses était-elle enceinte ou en période de viduité ?',
         type: 'boolean',
         next: (answer) => {
             // Si au moins une épouse était enceinte/en période de viduité, rediriger vers contact
@@ -79,7 +79,7 @@ export const questionTree = {
     },
     woman_has_children: {
         id: 'woman_has_children',
-        text: 'La défunte a-t-elle un/des enfants musulmans ?',
+        text: 'La défunte a-t-elle des enfants musulmans et légitimes (nés d\'un mariage) ?',
         type: 'boolean',
         next: (answer) => {
             // Si elle a des enfants, demander combien de fils et de filles
@@ -94,7 +94,7 @@ export const questionTree = {
 
     man_has_children: {
         id: 'man_has_children',
-        text: 'Le défunt a-t-il un/des enfants musulmans et légitimes (issus d\'un mariage) ?',
+        text: 'Le défunt a-t-il des enfants musulmans et légitimes (nés d\'un mariage) ?',
         type: 'boolean',
         next: (answer) => {
             // Si il a des enfants, demander combien de fils et de filles
