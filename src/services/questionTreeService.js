@@ -111,8 +111,8 @@ export const questionTree = {
     has_muslim_ascendants: {
         id: 'has_muslim_ascendants',
         getText: (answers) => answers.deceased_gender ?
-            'Le défunt a-t-il des ascendants musulmans (parents/grands-parents/arrière-grands-parents) ?' :
-            'La défunte a-t-elle des ascendants musulmans (parents/grands-parents/arrière-grands-parents) ?',
+            'Le défunt a-t-il encore des ascendants musulmans en vie  (parents, grands-parents, arrière-grands-parents) ?' :
+            'La défunte a-t-elle encore des ascendants musulmans en vie (parents, grands-parents, arrière-grands-parents) ?',
         type: 'boolean',
         next: (answer) => {
             // Si la personne a des ascendants musulmans, on pourrait poser des questions plus spécifiques
