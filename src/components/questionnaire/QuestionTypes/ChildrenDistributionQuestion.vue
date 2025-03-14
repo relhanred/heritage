@@ -129,7 +129,19 @@ const validateInput = (sons, daughters) => {
 
   // Vérifier qu'il y a au moins un enfant au total
   if (sonCount + daughterCount === 0) {
-    validationError.value = `Veuillez indiquer au moins un ${props.labelPrefix === 'children' ? 'enfant' : props.labelPrefix}.`;
+    // Traduire correctement en fonction du type d'enfants
+    let messageType;
+    if (props.labelPrefix === 'children') {
+      messageType = 'enfant';
+    } else if (props.labelPrefix === 'petits-enfants') {
+      messageType = 'petit-enfant';
+    } else if (props.labelPrefix === 'arriere-petits-enfants') {
+      messageType = 'arrière-petit-enfant';
+    } else {
+      messageType = props.labelPrefix;
+    }
+
+    validationError.value = `Veuillez indiquer au moins un ${messageType}.`;
     emit('update:validationError', validationError.value);
     return false;
   }
