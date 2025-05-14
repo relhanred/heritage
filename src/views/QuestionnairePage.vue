@@ -30,6 +30,13 @@
               :name="currentQuestion.id"
           />
 
+          <AscendantsTreeQuestion
+              v-else-if="currentQuestion.type === 'ascendants_tree'"
+              :modelValue="ascendantsSelection"
+              @update:modelValue="ascendantsSelection = $event"
+              :gender="questionnaireStore.answers.deceased_gender"
+          />
+
           <DescendantsTreeQuestion
               v-else-if="currentQuestion.type === 'descendants_tree'"
               :modelValue="descendantsTree"
@@ -38,11 +45,8 @@
               @update:validationError="descendantsValidationError = $event"
           />
 
-          <AscendantsTreeQuestion
-              v-else-if="currentQuestion.type === 'ascendants_tree'"
-              :modelValue="ascendantsSelection"
-              @update:modelValue="ascendantsSelection = $event"
-              :gender="questionnaireStore.answers.deceased_gender"
+          <StructuredSummaryQuestion
+              v-else-if="currentQuestion.type === 'structured_summary'"
           />
 
           <InfoQuestion
@@ -68,7 +72,7 @@
               :disabled="!isAnswerValid"
               :class="{'opacity-50 cursor-not-allowed': !isAnswerValid}"
           >
-            Suivant
+            {{ currentQuestion.type === 'structured_summary' ? 'Finaliser' : 'Suivant' }}
           </button>
         </div>
       </div>
@@ -89,6 +93,7 @@ import RadioQuestion from '@/components/questionnaire/QuestionTypes/RadioQuestio
 import InfoQuestion from '@/components/questionnaire/QuestionTypes/InfoQuestion.vue';
 import AscendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/AscendantsTreeQuestion.vue';
 import DescendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/DescendantsTreeQuestion.vue';
+import StructuredSummaryQuestion from '@/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue';
 
 const router = useRouter();
 const questionnaireStore = useQuestionnaireStore();
@@ -135,8 +140,8 @@ const isAnswerValid = computed(() => {
     // car la personne peut n'avoir aucun ascendant vivant
     return true;
   }
-  else if (type === 'info') {
-    // Pour les questions de type info, pas besoin de réponse
+  else if (type === 'info' || type === 'structured_summary') {
+    // Pour les questions de type info ou résumé, pas besoin de réponse
     return true;
   }
 
@@ -207,8 +212,8 @@ const saveCurrentAnswer = () => {
     // Sauvegarder les sélections d'ascendants
     questionnaireStore.saveAnswer(currentQuestion.value.id, ascendantsSelection.value);
   }
-  else if (currentQuestion.value.type !== 'info') {
-    // Pour les autres types de questions (sauf info)
+  else if (currentQuestion.value.type !== 'info' && currentQuestion.value.type !== 'structured_summary') {
+    // Pour les autres types de questions (sauf info et résumé)
     questionnaireStore.saveAnswer(currentQuestion.value.id, currentAnswer.value);
   }
 };
