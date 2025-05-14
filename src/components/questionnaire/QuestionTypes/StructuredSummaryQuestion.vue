@@ -37,7 +37,7 @@
       </div>
 
       <!-- Frères et sœurs -->
-      <div class="summary-section">
+      <div class="summary-section" v-if="hasSiblings || siblingsDataExists">
         <h3 class="section-title">Frères et sœurs</h3>
         <div v-if="hasSiblings">
           <div v-if="siblings.brothers > 0" class="info-item">
@@ -163,6 +163,12 @@ const siblings = computed(() => answers.value.siblings_details || {
   halfSistersFather: 0,
   halfBrothersMother: 0,
   halfSistersMother: 0
+});
+
+// Vérifier si des données sur les frères et sœurs existent
+// (même si tous sont à 0, ça signifie que l'étape a été affichée)
+const siblingsDataExists = computed(() => {
+  return answers.value.siblings_details !== undefined;
 });
 
 // Vérifier si au moins un frère ou une sœur est présent

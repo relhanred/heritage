@@ -73,7 +73,7 @@
           </div>
 
           <!-- Section Frères et Sœurs -->
-          <div class="section-card">
+          <div class="section-card" v-if="hasSiblings || siblingsDataExists">
             <div class="section-header">
               <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="8" cy="7" r="4"></circle>
@@ -234,6 +234,9 @@ const siblingsData = computed(() => answers.value.siblings_details || {
   halfBrothersMother: 0,
   halfSistersMother: 0
 });
+
+// Vérifier si les données sur les frères et sœurs existent
+const siblingsDataExists = computed(() => answers.value.siblings_details !== undefined);
 
 // Vérifier si au moins un frère ou une sœur est présent
 const hasSiblings = computed(() =>

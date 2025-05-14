@@ -96,10 +96,39 @@ export const questionTree = {
             'Veuillez indiquer le nombre de descendants musulmans et en vie du défunt :' :
             'Veuillez indiquer le nombre de descendants musulmans et en vie de la défunte :',
         type: 'descendants_tree',
-        next: (answer) => 'siblings_details' // Ensuite on va aux frères et sœurs
+        next: (answer, allAnswers) => {
+            // Vérifier si l'arbre des frères et sœurs doit être affiché
+
+            // Extraire les données sur les descendants
+            const descendants = answer || {};
+            const hasMaleDescendants = (descendants.sons > 0 || descendants.grandsons > 0 || descendants.greatGrandsons > 0);
+            const hasAnyDescendants = (
+                descendants.sons > 0 || descendants.daughters > 0 ||
+                descendants.grandsons > 0 || descendants.granddaughters > 0 ||
+                descendants.greatGrandsons > 0 || descendants.greatGranddaughters > 0
+            );
+
+            // Extraire les données sur les ascendants vivants
+            const ascendants = allAnswers.ascendants_details || {};
+            const isFatherAlive = ascendants.father === true;
+            const isMotherAlive = ascendants.mother === true;
+
+            // Condition 1: Aucun descendant mâle ET père non vivant
+            const condition1 = !hasMaleDescendants && !isFatherAlive;
+
+            // Condition 2: Aucun descendant (de n'importe quel genre) ET mère vivante
+            const condition2 = !hasAnyDescendants && isMotherAlive;
+
+            // Afficher l'arbre des frères et sœurs seulement si l'une des conditions est remplie
+            if (condition1 || condition2) {
+                return 'siblings_details'; // Afficher l'arbre des frères et sœurs
+            } else {
+                return 'structured_summary'; // Aller directement au résumé
+            }
+        }
     },
 
-    // Arbre des frères et sœurs (après les descendants)
+    // Arbre des frères et sœurs (après les descendants, affiché conditionnellement)
     siblings_details: {
         id: 'siblings_details',
         getText: (answers) => answers.deceased_gender ?
