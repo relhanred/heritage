@@ -102,7 +102,9 @@ export const questionTree = {
     structured_summary: {
         id: 'structured_summary',
         type: 'structured_summary',
-        next: (answer) => 'end'
+        // Modifier ici pour rediriger directement vers /merci au lieu de passer par une étape 'end'
+        finalPage: true, // Ajout d'un indicateur que c'est la dernière question
+        next: (answer) => null // Retourner null indique que c'est la fin du questionnaire
     },
 
     special_case: {
@@ -111,11 +113,6 @@ export const questionTree = {
         type: 'info',
         specialRedirect: '/contact', // Indique une redirection spéciale
         next: (answer) => null // Ajout d'une fonction next pour éviter des erreurs potentielles
-    },
-
-    end: {
-        id: 'end',
-        next: null // Fin du questionnaire
     }
 };
 

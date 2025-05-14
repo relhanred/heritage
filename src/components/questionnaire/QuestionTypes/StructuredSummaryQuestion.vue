@@ -26,7 +26,7 @@
       <!-- Ascendants vivants -->
       <div class="summary-section">
         <h3 class="section-title">Ascendants vivants</h3>
-        <div v-if="hasAscendants && livingAscendants.length > 0">
+        <div v-if="livingAscendants.length > 0">
           <div v-for="(ascendant, index) in livingAscendants" :key="index" class="info-item">
             <span class="info-value">{{ ascendant }}</span>
           </div>
@@ -90,8 +90,8 @@ const gender = computed(() => answers.value.deceased_gender);
 const maritalStatus = computed(() => answers.value.marital_status);
 const wivesCount = computed(() => answers.value.wives_count);
 
-// Ascendants
-const hasAscendants = computed(() => answers.value.has_muslim_ascendants);
+// Ascendants - La propriété has_muslim_ascendants n'existe pas dans les données
+// nous devons la supprimer car elle empêche l'affichage correct
 const ascendants = computed(() => answers.value.ascendants_details || {});
 
 // Liste des ascendants vivants

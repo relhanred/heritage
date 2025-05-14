@@ -72,7 +72,7 @@
               :disabled="!isAnswerValid"
               :class="{'opacity-50 cursor-not-allowed': !isAnswerValid}"
           >
-            {{ currentQuestion.type === 'structured_summary' ? 'Finaliser' : 'Suivant' }}
+            {{ getFinalButtonText }}
           </button>
         </div>
       </div>
@@ -146,6 +146,16 @@ const isAnswerValid = computed(() => {
   }
 
   return false;
+});
+
+// Texte personnalisé pour le bouton en fonction de l'étape
+const getFinalButtonText = computed(() => {
+  // Si c'est la dernière étape (résumé), afficher "Finaliser"
+  if (currentQuestion.value && currentQuestion.value.finalPage) {
+    return 'Finaliser';
+  }
+  // Sinon, afficher "Suivant"
+  return 'Suivant';
 });
 
 // Chargement initial des données
@@ -274,6 +284,12 @@ const submitAnswer = () => {
 
   // Sauvegarder la réponse selon le type de question
   saveCurrentAnswer();
+
+  // Si la question actuelle est la dernière (résumé structuré), rediriger directement
+  if (currentQuestion.value.finalPage) {
+    router.push('/merci');
+    return;
+  }
 
   // Déterminer la réponse pour la navigation
   let nextAnswer = getCurrentAnswerValue();
