@@ -72,6 +72,52 @@
             </div>
           </div>
 
+          <!-- Section Frères et Sœurs -->
+          <div class="section-card">
+            <div class="section-header">
+              <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="7" r="4"></circle>
+                <circle cx="16" cy="7" r="4"></circle>
+                <path d="M8 11v6"></path>
+                <path d="M16 11v6"></path>
+                <path d="M3 17h18"></path>
+              </svg>
+              <h4 class="section-title">Frères et Sœurs</h4>
+            </div>
+
+            <div class="section-content">
+              <div v-if="hasSiblings" class="siblings-grid">
+                <div v-if="siblingsData.brothers > 0" class="sibling-item">
+                  <div class="sibling-count">{{ siblingsData.brothers }}</div>
+                  <div class="sibling-type">{{ siblingsData.brothers > 1 ? 'Frères' : 'Frère' }}</div>
+                </div>
+                <div v-if="siblingsData.sisters > 0" class="sibling-item">
+                  <div class="sibling-count">{{ siblingsData.sisters }}</div>
+                  <div class="sibling-type">{{ siblingsData.sisters > 1 ? 'Sœurs' : 'Sœur' }}</div>
+                </div>
+                <div v-if="siblingsData.halfBrothersFather > 0" class="sibling-item half-sibling">
+                  <div class="sibling-count">{{ siblingsData.halfBrothersFather }}</div>
+                  <div class="sibling-type">{{ siblingsData.halfBrothersFather > 1 ? 'Demi-frères (père)' : 'Demi-frère (père)' }}</div>
+                </div>
+                <div v-if="siblingsData.halfSistersFather > 0" class="sibling-item half-sibling">
+                  <div class="sibling-count">{{ siblingsData.halfSistersFather }}</div>
+                  <div class="sibling-type">{{ siblingsData.halfSistersFather > 1 ? 'Demi-sœurs (père)' : 'Demi-sœur (père)' }}</div>
+                </div>
+                <div v-if="siblingsData.halfBrothersMother > 0" class="sibling-item half-sibling">
+                  <div class="sibling-count">{{ siblingsData.halfBrothersMother }}</div>
+                  <div class="sibling-type">{{ siblingsData.halfBrothersMother > 1 ? 'Demi-frères (mère)' : 'Demi-frère (mère)' }}</div>
+                </div>
+                <div v-if="siblingsData.halfSistersMother > 0" class="sibling-item half-sibling">
+                  <div class="sibling-count">{{ siblingsData.halfSistersMother }}</div>
+                  <div class="sibling-type">{{ siblingsData.halfSistersMother > 1 ? 'Demi-sœurs (mère)' : 'Demi-sœur (mère)' }}</div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                Aucun frère ou sœur n'a été indiqué
+              </div>
+            </div>
+          </div>
+
           <!-- Section Descendants -->
           <div class="section-card">
             <div class="section-header">
@@ -178,6 +224,26 @@ const livingAscendants = computed(() => {
         }
       });
 });
+
+// Frères et sœurs
+const siblingsData = computed(() => answers.value.siblings_details || {
+  brothers: 0,
+  sisters: 0,
+  halfBrothersFather: 0,
+  halfSistersFather: 0,
+  halfBrothersMother: 0,
+  halfSistersMother: 0
+});
+
+// Vérifier si au moins un frère ou une sœur est présent
+const hasSiblings = computed(() =>
+    siblingsData.value.brothers > 0 ||
+    siblingsData.value.sisters > 0 ||
+    siblingsData.value.halfBrothersFather > 0 ||
+    siblingsData.value.halfSistersFather > 0 ||
+    siblingsData.value.halfBrothersMother > 0 ||
+    siblingsData.value.halfSistersMother > 0
+);
 
 // Descendants
 const descendants = computed(() => answers.value.descendants_tree || {});
@@ -340,7 +406,7 @@ const startNew = () => {
   padding: 1rem;
 }
 
-.relatives-grid, .descendants-grid {
+.relatives-grid, .descendants-grid, .siblings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 0.75rem;
@@ -359,20 +425,25 @@ const startNew = () => {
   font-size: 0.625rem;
 }
 
-.descendant-item {
+.descendant-item, .sibling-item {
   background-color: #f9fafb;
   border-radius: 0.5rem;
   padding: 0.75rem;
   text-align: center;
 }
 
-.descendant-count {
+.sibling-item.half-sibling {
+  background-color: #f0f9ff; /* Un fond légèrement bleuté pour différencier les demi-frères/sœurs */
+  border-left: 3px solid #3b82f6;
+}
+
+.descendant-count, .sibling-count {
   font-size: 1.5rem;
   font-weight: 600;
   color: #047857;
 }
 
-.descendant-type {
+.descendant-type, .sibling-type {
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: 0.25rem;
@@ -388,15 +459,15 @@ const startNew = () => {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .relatives-grid, .descendants-grid {
+  .relatives-grid, .descendants-grid, .siblings-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 
-  .descendant-count {
+  .descendant-count, .sibling-count {
     font-size: 1.25rem;
   }
 
-  .descendant-type {
+  .descendant-type, .sibling-type {
     font-size: 0.7rem;
   }
 }

@@ -79,23 +79,33 @@ export const questionTree = {
         }
     },
 
-    // Question pour sélectionner les ascendants vivants (directement après les questions de base)
+    // Question pour sélectionner les ascendants vivants
     ascendants_details: {
         id: 'ascendants_details',
         getText: (answers) => answers.deceased_gender ?
             'Veuillez sélectionner les ascendants du défunt qui sont encore en vie :' :
             'Veuillez sélectionner les ascendants de la défunte qui sont encore en vie :',
         type: 'ascendants_tree',
-        next: (answer) => 'descendants_tree'
+        next: (answer) => 'descendants_tree' // On va maintenant aux descendants
     },
 
-    // Arbre des descendants (maintenant APRÈS les ascendants)
+    // Arbre des descendants (après les ascendants)
     descendants_tree: {
         id: 'descendants_tree',
         getText: (answers) => answers.deceased_gender ?
             'Veuillez indiquer le nombre de descendants musulmans et en vie du défunt :' :
             'Veuillez indiquer le nombre de descendants musulmans et en vie de la défunte :',
         type: 'descendants_tree',
+        next: (answer) => 'siblings_details' // Ensuite on va aux frères et sœurs
+    },
+
+    // Arbre des frères et sœurs (après les descendants)
+    siblings_details: {
+        id: 'siblings_details',
+        getText: (answers) => answers.deceased_gender ?
+            'Veuillez indiquer le nombre de frères et sœurs du défunt :' :
+            'Veuillez indiquer le nombre de frères et sœurs de la défunte :',
+        type: 'siblings_tree',
         next: (answer) => 'structured_summary'
     },
 

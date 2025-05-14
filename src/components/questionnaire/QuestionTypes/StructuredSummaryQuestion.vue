@@ -36,6 +36,40 @@
         </div>
       </div>
 
+      <!-- Frères et sœurs -->
+      <div class="summary-section">
+        <h3 class="section-title">Frères et sœurs</h3>
+        <div v-if="hasSiblings">
+          <div v-if="siblings.brothers > 0" class="info-item">
+            <span class="info-label">Frères:</span>
+            <span class="info-value">{{ siblings.brothers }}</span>
+          </div>
+          <div v-if="siblings.sisters > 0" class="info-item">
+            <span class="info-label">Sœurs:</span>
+            <span class="info-value">{{ siblings.sisters }}</span>
+          </div>
+          <div v-if="siblings.halfBrothersFather > 0" class="info-item">
+            <span class="info-label">Demi-frères (père):</span>
+            <span class="info-value">{{ siblings.halfBrothersFather }}</span>
+          </div>
+          <div v-if="siblings.halfSistersFather > 0" class="info-item">
+            <span class="info-label">Demi-sœurs (père):</span>
+            <span class="info-value">{{ siblings.halfSistersFather }}</span>
+          </div>
+          <div v-if="siblings.halfBrothersMother > 0" class="info-item">
+            <span class="info-label">Demi-frères (mère):</span>
+            <span class="info-value">{{ siblings.halfBrothersMother }}</span>
+          </div>
+          <div v-if="siblings.halfSistersMother > 0" class="info-item">
+            <span class="info-label">Demi-sœurs (mère):</span>
+            <span class="info-value">{{ siblings.halfSistersMother }}</span>
+          </div>
+        </div>
+        <div v-else class="info-item">
+          <span class="info-value">Aucun frère ou sœur</span>
+        </div>
+      </div>
+
       <!-- Descendants vivants -->
       <div class="summary-section">
         <h3 class="section-title">Descendants</h3>
@@ -120,6 +154,26 @@ const livingAscendants = computed(() => {
         }
       });
 });
+
+// Frères et sœurs
+const siblings = computed(() => answers.value.siblings_details || {
+  brothers: 0,
+  sisters: 0,
+  halfBrothersFather: 0,
+  halfSistersFather: 0,
+  halfBrothersMother: 0,
+  halfSistersMother: 0
+});
+
+// Vérifier si au moins un frère ou une sœur est présent
+const hasSiblings = computed(() =>
+    siblings.value.brothers > 0 ||
+    siblings.value.sisters > 0 ||
+    siblings.value.halfBrothersFather > 0 ||
+    siblings.value.halfSistersFather > 0 ||
+    siblings.value.halfBrothersMother > 0 ||
+    siblings.value.halfSistersMother > 0
+);
 
 // Descendants
 const descendants = computed(() => answers.value.descendants_tree || {});
