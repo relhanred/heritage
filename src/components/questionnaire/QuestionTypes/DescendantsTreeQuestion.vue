@@ -330,7 +330,7 @@ watch(() => props.modelValue, validateInput, { deep: true });
 .grandchildren-container {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 10px; /* Réduit l'écart entre les petits-fils et petites-filles */
 }
 
 .grandchild-group {
@@ -346,7 +346,25 @@ watch(() => props.modelValue, validateInput, { deep: true });
 .greatgrandchildren-container {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 10px; /* Réduit l'écart entre les arrière-petits-fils et arrière-petites-filles */
+  border: 1px dashed #d97706; /* Couleur ambre pour différencier du niveau précédent */
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 5px;
+  position: relative;
+}
+
+/* Étiquette qui indique que ce sont des descendants du petit-fils */
+.greatgrandchildren-container::before {
+  content: "Descendants du petit-fils";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  color: #92400e; /* Couleur ambre plus foncée pour l'étiquette */
 }
 
 .validation-error {
@@ -356,8 +374,32 @@ watch(() => props.modelValue, validateInput, { deep: true });
   text-align: center;
 }
 
+/* Suppression de la marge négative qui peut créer une confusion visuelle */
 .petites-filles {
-  margin-left: -15px; /* Ajustement supplémentaire pour les petites-filles */
+  margin-left: 0;
+}
+
+/* Ajout d'une bordure pointillée pour regrouper visuellement les petits-enfants */
+.grandchildren-container {
+  border: 1px dashed #9ca3af;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 5px;
+  position: relative;
+  margin-bottom: 5px; /* Ajoute un peu d'espace en dessous pour séparer des autres éléments */
+}
+
+/* Étiquette qui indique que ce sont des descendants du fils */
+.grandchildren-container::before {
+  content: "Descendants du fils";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  color: #6b7280;
 }
 
 @media (max-width: 640px) {
@@ -379,10 +421,30 @@ watch(() => props.modelValue, validateInput, { deep: true });
     font-size: 0.75rem;
   }
 
-  .children-container,
-  .grandchildren-container,
+  .children-container {
+    gap: 15px; /* Écart réduit sur mobile */
+  }
+
+  .grandchildren-container {
+    gap: 5px; /* Écart minimal sur mobile */
+    padding: 8px 5px;
+  }
+
   .greatgrandchildren-container {
-    gap: 3px; /* Écart minimal partout sur mobile */
+    gap: 5px;
+  }
+
+  .grandchildren-container::before {
+    font-size: 0.6rem;
+  }
+
+  .greatgrandchildren-container {
+    gap: 5px;
+    padding: 8px 5px;
+  }
+
+  .greatgrandchildren-container::before {
+    font-size: 0.6rem;
   }
 }
 </style>
