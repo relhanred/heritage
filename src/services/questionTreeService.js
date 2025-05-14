@@ -14,9 +14,9 @@ export const questionTree = {
             'La défunte était-elle mariée ?',
         type: 'boolean',
         next: (answer, allAnswers) => {
-            // Si c'est une femme (mariée ou non), on demande si elle a des enfants
+            // Si c'est une femme (mariée ou non), on passe directement à l'arbre des descendants
             if (!allAnswers.deceased_gender) {
-                return 'woman_has_children';
+                return 'descendants_tree';
             }
 
             // Si c'est un homme marié, demander le nombre d'épouses
@@ -24,8 +24,8 @@ export const questionTree = {
                 return 'wives_count';
             }
 
-            // Si c'est un homme non marié, demander s'il a des enfants
-            return 'man_has_children';
+            // Si c'est un homme non marié, passer directement à l'arbre des descendants
+            return 'descendants_tree';
         }
     },
     wives_count: {
@@ -58,8 +58,8 @@ export const questionTree = {
             if (answer === true) {
                 return 'special_case';
             } else {
-                // Si pas enceinte, passer à la question sur les enfants pour un homme
-                return 'man_has_children';
+                // Si pas enceinte, passer directement à l'arbre des descendants
+                return 'descendants_tree';
             }
         }
     },
@@ -72,46 +72,83 @@ export const questionTree = {
             if (answer === true) {
                 return 'special_case';
             } else {
-                // Si aucune n'est enceinte, passer à la question sur les enfants pour un homme
-                return 'man_has_children';
-            }
-        }
-    },
-    woman_has_children: {
-        id: 'woman_has_children',
-        text: 'La défunte a-t-elle des enfants musulmans et légitimes (nés d\'un mariage) ?',
-        type: 'boolean',
-        next: (answer) => {
-            // Si elle a des enfants, demander combien de fils et de filles
-            if (answer === true) {
-                return 'children_count';
-            } else {
-                // Si pas d'enfants, demander si elle a des ascendants musulmans
-                return 'has_muslim_ascendants';
+                // Si aucune n'est enceinte, passer directement à l'arbre des descendants
+                return 'descendants_tree';
             }
         }
     },
 
-    man_has_children: {
-        id: 'man_has_children',
-        text: 'Le défunt a-t-il des enfants musulmans et légitimes (nés d\'un mariage) ?',
-        type: 'boolean',
-        next: (answer) => {
-            // Si il a des enfants, demander combien de fils et de filles
-            if (answer === true) {
-                return 'children_count';
-            } else {
-                // Si pas d'enfants, demander s'il a des ascendants musulmans
-                return 'has_muslim_ascendants';
+    // Nouvel arbre des descendants (directement sans question préalable)
+    descendants_tree: {
+        id: 'descendants_tree',
+        getText: (answers) => answers.deceased_gender ?
+            'Veuillez indiquer le nombre de descendants musulmans et en vie du défunt :' :
+            'Veuillez indiquer le nombre de descendants musulmans et en vie de la défunte :',
+        type: 'descendants_tree',
+        next: (answer) => 'descendants_summary'
+    },
+
+    // Résumé des descendants sélectionnés
+    descendants_summary: {
+        id: 'descendants_summary',
+        getText: (answers) => {
+            const descendants = answers.descendants_tree || {};
+
+            // Récupérer les nombres (convertir en entiers)
+            const sons = parseInt(descendants.sons) || 0;
+            const daughters = parseInt(descendants.daughters) || 0;
+            const grandsons = parseInt(descendants.grandsons) || 0;
+            const granddaughters = parseInt(descendants.granddaughters) || 0;
+            const greatGrandsons = parseInt(descendants.greatGrandsons) || 0;
+            const greatGranddaughters = parseInt(descendants.greatGranddaughters) || 0;
+
+            // Construire un résumé des descendants
+            const parts = [];
+
+            if (sons > 0) {
+                parts.push(`${sons} fils`);
             }
-        }
+
+            if (daughters > 0) {
+                parts.push(`${daughters} fille${daughters > 1 ? 's' : ''}`);
+            }
+
+            if (grandsons > 0) {
+                parts.push(`${grandsons} petit${grandsons > 1 ? 's' : ''}-fils`);
+            }
+
+            if (granddaughters > 0) {
+                parts.push(`${granddaughters} petite${granddaughters > 1 ? 's' : ''}-fille${granddaughters > 1 ? 's' : ''}`);
+            }
+
+            if (greatGrandsons > 0) {
+                parts.push(`${greatGrandsons} arrière-petit${greatGrandsons > 1 ? 's' : ''}-fils`);
+            }
+
+            if (greatGranddaughters > 0) {
+                parts.push(`${greatGranddaughters} arrière-petite${greatGranddaughters > 1 ? 's' : ''}-fille${greatGranddaughters > 1 ? 's' : ''}`);
+            }
+
+            const prefix = answers.deceased_gender ? 'Le défunt a ' : 'La défunte a ';
+
+            if (parts.length === 0) {
+                return 'Aucun descendant n\'a été indiqué.';
+            } else if (parts.length === 1) {
+                return `${prefix}${parts[0]}.`;
+            } else {
+                const lastPart = parts.pop();
+                return `${prefix}${parts.join(', ')} et ${lastPart}.`;
+            }
+        },
+        type: 'info',
+        next: (answer) => 'has_muslim_ascendants'
     },
 
     // Nouvelle question sur les ascendants musulmans
     has_muslim_ascendants: {
         id: 'has_muslim_ascendants',
         getText: (answers) => answers.deceased_gender ?
-            'Le défunt a-t-il encore des ascendants musulmans en vie  (parents, grands-parents, arrière-grands-parents) ?' :
+            'Le défunt a-t-il encore des ascendants musulmans en vie (parents, grands-parents, arrière-grands-parents) ?' :
             'La défunte a-t-elle encore des ascendants musulmans en vie (parents, grands-parents, arrière-grands-parents) ?',
         type: 'boolean',
         next: (answer) => {
@@ -132,11 +169,7 @@ export const questionTree = {
             'Veuillez sélectionner les ascendants du défunt qui sont encore en vie :' :
             'Veuillez sélectionner les ascendants de la défunte qui sont encore en vie :',
         type: 'ascendants_tree',
-        next: (answer) => {
-            // Analyse des ascendants sélectionnés pourrait déterminer la prochaine question
-            // Pour l'instant, on termine simplement le questionnaire
-            return 'ascendants_summary';
-        }
+        next: (answer) => 'ascendants_summary'
     },
 
     // Résumé des ascendants sélectionnés
@@ -171,211 +204,7 @@ export const questionTree = {
         type: 'info',
         next: (answer) => 'end'
     },
-    children_count: {
-        id: 'children_count',
-        getText: (answers) => answers.deceased_gender ?
-            'Veuillez indiquer la répartition des enfants du défunt :' :
-            'Veuillez indiquer la répartition des enfants de la défunte :',
-        type: 'children_distribution',
-        next: (answer) => {
-            // On peut ajouter une logique conditionnelle basée sur le nombre d'enfants ici
-            const totalSons = parseInt(answer.sons) || 0;
-            const totalDaughters = parseInt(answer.daughters) || 0;
 
-            // Si aucun fils, demander s'il y a des fils décédés
-            if (totalSons === 0) {
-                return 'has_deceased_sons';
-            }
-
-            // S'il y a au moins un fils, passer à la question sur les ascendants
-            if (totalSons > 0) {
-                return 'has_muslim_ascendants';
-            }
-            // Ce cas ne devrait pas se produire, mais par sécurité
-            else if (totalSons === 0 && totalDaughters > 0) {
-                return 'only_daughters';
-            } else {
-                // Cas où les deux sont 0, ce qui ne devrait pas arriver si l'utilisateur a répondu oui à la question précédente
-                return 'end';
-            }
-        }
-    },
-    // Question pour demander s'il y a des fils décédés
-    has_deceased_sons: {
-        id: 'has_deceased_sons',
-        getText: (answers) => answers.deceased_gender ?
-            'Le défunt a-t-il des fils décédés ?' :
-            'La défunte a-t-elle des fils décédés ?',
-        type: 'boolean',
-        next: (answer, allAnswers) => {
-            if (answer === true) {
-                return 'deceased_sons_children';
-            } else {
-                return 'has_muslim_ascendants';
-            }
-        }
-    },
-    // Question pour demander le nombre de petits-enfants issus des fils décédés
-    deceased_sons_children: {
-        id: 'deceased_sons_children',
-        getText: (answers) => answers.deceased_gender ?
-            'Veuillez indiquer le nombre de petits-enfants issus des fils décédés du défunt :' :
-            'Veuillez indiquer le nombre de petits-enfants issus des fils décédés de la défunte :',
-        type: 'grandchildren_distribution',
-        next: (answer, allAnswers) => {
-            // Logique de navigation basée sur la présence de petits-enfants
-            const totalGrandsons = parseInt(answer.grandsons) || 0;
-            const totalGranddaughters = parseInt(answer.granddaughters) || 0;
-
-            // Si au moins un petit-fils, aller directement à la question sur les ascendants
-            if (totalGrandsons > 0) {
-                return 'has_muslim_ascendants';
-            }
-
-            // Si aucun petit-fils, demander s'il y a des petits-fils décédés
-            if (totalGrandsons === 0) {
-                return 'has_deceased_grandsons';
-            }
-
-            if (totalGranddaughters > 0) {
-                return 'has_grandchildren';
-            } else {
-                // Si pas de petits-enfants et uniquement des filles
-                if (allAnswers.children_count && allAnswers.children_count.daughters > 0) {
-                    return 'only_daughters';
-                } else {
-                    return 'end';
-                }
-            }
-        }
-    },
-    // Question pour demander s'il y a des petits-fils décédés
-    has_deceased_grandsons: {
-        id: 'has_deceased_grandsons',
-        getText: (answers) => answers.deceased_gender ?
-            'Le défunt a-t-il des petits-fils décédés ?' :
-            'La défunte a-t-elle des petits-fils décédés ?',
-        type: 'boolean',
-        next: (answer, allAnswers) => {
-            if (answer === true) {
-                return 'deceased_grandsons_children';
-            } else {
-                return 'has_muslim_ascendants';
-            }
-        }
-    },
-    // Question pour les arrière-petits-enfants
-    deceased_grandsons_children: {
-        id: 'deceased_grandsons_children',
-        getText: (answers) => answers.deceased_gender ?
-            'Veuillez indiquer le nombre d\'arrière-petits-enfants issus des petits-fils décédés du défunt :' :
-            'Veuillez indiquer le nombre d\'arrière-petits-enfants issus des petits-fils décédés de la défunte :',
-        type: 'great_grandchildren_distribution',
-        next: (answer, allAnswers) => {
-            return 'has_muslim_ascendants';
-        }
-    },
-    // Affichage d'une information lorsque des arrière-petits-enfants sont présents
-    has_great_grandchildren: {
-        id: 'has_great_grandchildren',
-        text: 'Les arrière-petits-enfants issus des petits-fils décédés seront pris en compte dans la répartition.',
-        type: 'info',
-        next: (answer, allAnswers) => {
-            // Redirection basée sur la composition familiale
-            const hasDaughters = allAnswers.children_count && allAnswers.children_count.daughters > 0;
-            const hasGranddaughters = allAnswers.deceased_sons_children && allAnswers.deceased_sons_children.granddaughters > 0;
-
-            if (hasDaughters && hasGranddaughters) {
-                return 'complex_distribution';
-            } else if (hasDaughters) {
-                return 'daughters_and_great_grandchildren';
-            } else if (hasGranddaughters) {
-                return 'granddaughters_and_great_grandchildren';
-            } else {
-                return 'only_great_grandchildren';
-            }
-        }
-    },
-    // Affichage d'une information lorsque des petits-enfants sont présents
-    has_grandchildren: {
-        id: 'has_grandchildren',
-        text: 'Les petits-enfants issus des fils décédés seront pris en compte dans la répartition.',
-        type: 'info',
-        next: (answer, allAnswers) => {
-            // Si uniquement des filles et des petits-enfants (pas de fils vivants)
-            if (allAnswers.children_count && allAnswers.children_count.daughters > 0) {
-                return 'daughters_and_grandchildren';
-            } else {
-                return 'only_grandchildren';
-            }
-        }
-    },
-    daughters_and_grandchildren: {
-        id: 'daughters_and_grandchildren',
-        text: 'Le défunt a des filles et des petits-enfants issus de fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    only_grandchildren: {
-        id: 'only_grandchildren',
-        text: 'Le défunt a uniquement des petits-enfants issus de fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    only_granddaughters: {
-        id: 'only_granddaughters',
-        text: 'Le défunt a uniquement des petites-filles issues de fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    daughters_and_granddaughters: {
-        id: 'daughters_and_granddaughters',
-        text: 'Le défunt a des filles et des petites-filles issues de fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    daughters_and_great_grandchildren: {
-        id: 'daughters_and_great_grandchildren',
-        text: 'Le défunt a des filles et des arrière-petits-enfants issus des petits-fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    granddaughters_and_great_grandchildren: {
-        id: 'granddaughters_and_great_grandchildren',
-        text: 'Le défunt a des petites-filles et des arrière-petits-enfants issus des petits-fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    only_great_grandchildren: {
-        id: 'only_great_grandchildren',
-        text: 'Le défunt a uniquement des arrière-petits-enfants issus des petits-fils décédés.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    complex_distribution: {
-        id: 'complex_distribution',
-        text: 'Le défunt a une combinaison complexe d\'héritiers sur plusieurs générations qui nécessite une analyse détaillée.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    sons_and_daughters: {
-        id: 'sons_and_daughters',
-        text: 'Le défunt a à la fois des fils et des filles.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    only_sons: {
-        id: 'only_sons',
-        text: 'Le défunt n\'a que des fils.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
-    only_daughters: {
-        id: 'only_daughters',
-        text: 'Le défunt n\'a que des filles.',
-        type: 'info',
-        next: (answer) => 'end'
-    },
     special_case: {
         id: 'special_case',
         text: 'La situation nécessite une consultation particulière.',
@@ -383,6 +212,7 @@ export const questionTree = {
         specialRedirect: '/contact', // Indique une redirection spéciale
         next: (answer) => null // Ajout d'une fonction next pour éviter des erreurs potentielles
     },
+
     end: {
         id: 'end',
         text: 'Merci d\'avoir répondu aux questions',

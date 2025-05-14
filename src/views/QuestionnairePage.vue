@@ -22,43 +22,20 @@
               :options="currentQuestion.options || {}"
           />
 
-          <ChildrenDistributionQuestion
-              v-else-if="currentQuestion.type === 'children_distribution'"
-              :modelValue="childrenDistribution"
-              @update:modelValue="childrenDistribution = $event"
-              @update:validationError="childrenValidationError = $event"
-          />
-
-          <ChildrenDistributionQuestion
-              v-else-if="currentQuestion.type === 'grandchildren_distribution'"
-              :modelValue="grandchildrenDistribution"
-              @update:modelValue="grandchildrenDistribution = $event"
-              labelPrefix="petits-enfants"
-              sonsKey="grandsons"
-              daughtersKey="granddaughters"
-              sonsLabel="petits-fils"
-              daughtersLabel="petites-filles"
-              @update:validationError="grandchildrenValidationError = $event"
-          />
-
-          <ChildrenDistributionQuestion
-              v-else-if="currentQuestion.type === 'great_grandchildren_distribution'"
-              :modelValue="greatGrandchildrenDistribution"
-              @update:modelValue="greatGrandchildrenDistribution = $event"
-              labelPrefix="arriere-petits-enfants"
-              sonsKey="greatGrandsons"
-              daughtersKey="greatGranddaughters"
-              sonsLabel="arrière-petits-fils"
-              daughtersLabel="arrière-petites-filles"
-              @update:validationError="greatGrandchildrenValidationError = $event"
-          />
-
           <RadioQuestion
               v-else-if="currentQuestion.type === 'radio'"
               :modelValue="currentAnswer"
               @update:modelValue="currentAnswer = $event"
               :options="currentQuestion.options || []"
               :name="currentQuestion.id"
+          />
+
+          <DescendantsTreeQuestion
+              v-else-if="currentQuestion.type === 'descendants_tree'"
+              :modelValue="descendantsTree"
+              @update:modelValue="descendantsTree = $event"
+              :gender="questionnaireStore.answers.deceased_gender"
+              @update:validationError="descendantsValidationError = $event"
           />
 
           <AscendantsTreeQuestion
@@ -108,10 +85,10 @@ import { questionTree, getQuestionText } from '@/services/questionTreeService';
 // Importer les composants
 import QuestionContainer from '@/components/questionnaire/QuestionContainer.vue';
 import BooleanQuestion from '@/components/questionnaire/QuestionTypes/BooleanQuestion.vue';
-import ChildrenDistributionQuestion from '@/components/questionnaire/QuestionTypes/ChildrenDistributionQuestion.vue';
 import RadioQuestion from '@/components/questionnaire/QuestionTypes/RadioQuestion.vue';
 import InfoQuestion from '@/components/questionnaire/QuestionTypes/InfoQuestion.vue';
 import AscendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/AscendantsTreeQuestion.vue';
+import DescendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/DescendantsTreeQuestion.vue';
 
 const router = useRouter();
 const questionnaireStore = useQuestionnaireStore();
@@ -122,15 +99,18 @@ const questionHistory = ref([]); // Historique des questions pour permettre de r
 
 // Réponses
 const currentAnswer = ref(null);
-const childrenDistribution = ref({ sons: '', daughters: '' });
-const grandchildrenDistribution = ref({ grandsons: '', granddaughters: '' });
-const greatGrandchildrenDistribution = ref({ greatGrandsons: '', greatGranddaughters: '' });
-const ascendantsSelection = ref({}); // Nouvelle variable pour la sélection des ascendants
+const ascendantsSelection = ref({}); // Variable pour la sélection des ascendants
+const descendantsTree = ref({
+  sons: '0',
+  daughters: '0',
+  grandsons: '0',
+  granddaughters: '0',
+  greatGrandsons: '0',
+  greatGranddaughters: '0'
+}); // Variable pour l'arbre des descendants
 
 // Messages d'erreur
-const childrenValidationError = ref('');
-const grandchildrenValidationError = ref('');
-const greatGrandchildrenValidationError = ref('');
+const descendantsValidationError = ref('');
 
 // Obtenir la question actuelle
 const currentQuestion = computed(() => questionTree[currentQuestionKey.value] || {});
@@ -147,14 +127,8 @@ const isAnswerValid = computed(() => {
   if (type === 'boolean' || type === 'radio' || type === 'select') {
     return currentAnswer.value !== null && currentAnswer.value !== '';
   }
-  else if (type === 'children_distribution') {
-    return !childrenValidationError.value;
-  }
-  else if (type === 'grandchildren_distribution') {
-    return !grandchildrenValidationError.value;
-  }
-  else if (type === 'great_grandchildren_distribution') {
-    return !greatGrandchildrenValidationError.value;
+  else if (type === 'descendants_tree') {
+    return !descendantsValidationError.value;
   }
   else if (type === 'ascendants_tree') {
     // Pour l'arbre généalogique, on considère que c'est toujours valide
@@ -177,35 +151,25 @@ onMounted(() => {
 const loadSavedAnswer = () => {
   const savedAnswer = questionnaireStore.answers[currentQuestion.value.id];
 
-  if (currentQuestion.value.type === 'children_distribution') {
+  if (currentQuestion.value.type === 'descendants_tree') {
     if (savedAnswer) {
-      childrenDistribution.value = {
-        sons: savedAnswer.sons?.toString() || '',
-        daughters: savedAnswer.daughters?.toString() || ''
+      descendantsTree.value = {
+        sons: savedAnswer.sons?.toString() || '0',
+        daughters: savedAnswer.daughters?.toString() || '0',
+        grandsons: savedAnswer.grandsons?.toString() || '0',
+        granddaughters: savedAnswer.granddaughters?.toString() || '0',
+        greatGrandsons: savedAnswer.greatGrandsons?.toString() || '0',
+        greatGranddaughters: savedAnswer.greatGranddaughters?.toString() || '0'
       };
     } else {
-      childrenDistribution.value = { sons: '', daughters: '' };
-    }
-  }
-  else if (currentQuestion.value.type === 'grandchildren_distribution') {
-    if (savedAnswer) {
-      // Conversion explicite en chaînes pour assurer la compatibilité avec les inputs
-      grandchildrenDistribution.value = {
-        grandsons: savedAnswer.grandsons?.toString() || '',
-        granddaughters: savedAnswer.granddaughters?.toString() || ''
+      descendantsTree.value = {
+        sons: '0',
+        daughters: '0',
+        grandsons: '0',
+        granddaughters: '0',
+        greatGrandsons: '0',
+        greatGranddaughters: '0'
       };
-    } else {
-      grandchildrenDistribution.value = { grandsons: '', granddaughters: '' };
-    }
-  }
-  else if (currentQuestion.value.type === 'great_grandchildren_distribution') {
-    if (savedAnswer) {
-      greatGrandchildrenDistribution.value = {
-        greatGrandsons: savedAnswer.greatGrandsons?.toString() || '',
-        greatGranddaughters: savedAnswer.greatGranddaughters?.toString() || ''
-      };
-    } else {
-      greatGrandchildrenDistribution.value = { greatGrandsons: '', greatGranddaughters: '' };
     }
   }
   else if (currentQuestion.value.type === 'ascendants_tree') {
@@ -227,25 +191,16 @@ const loadSavedAnswer = () => {
   }
 };
 
-// 2. Assurez-vous que la fonction saveCurrentAnswer() fonctionne correctement
 const saveCurrentAnswer = () => {
-  if (currentQuestion.value.type === 'children_distribution') {
+  if (currentQuestion.value.type === 'descendants_tree') {
+    // Sauvegarder l'arbre des descendants
     questionnaireStore.saveAnswer(currentQuestion.value.id, {
-      sons: parseInt(childrenDistribution.value.sons) || 0,
-      daughters: parseInt(childrenDistribution.value.daughters) || 0
-    });
-  }
-  else if (currentQuestion.value.type === 'grandchildren_distribution') {
-    // S'assurer que les valeurs sont converties en nombres pour stockage
-    questionnaireStore.saveAnswer(currentQuestion.value.id, {
-      grandsons: parseInt(grandchildrenDistribution.value.grandsons) || 0,
-      granddaughters: parseInt(grandchildrenDistribution.value.granddaughters) || 0
-    });
-  }
-  else if (currentQuestion.value.type === 'great_grandchildren_distribution') {
-    questionnaireStore.saveAnswer(currentQuestion.value.id, {
-      greatGrandsons: parseInt(greatGrandchildrenDistribution.value.greatGrandsons) || 0,
-      greatGranddaughters: parseInt(greatGrandchildrenDistribution.value.greatGranddaughters) || 0
+      sons: parseInt(descendantsTree.value.sons) || 0,
+      daughters: parseInt(descendantsTree.value.daughters) || 0,
+      grandsons: parseInt(descendantsTree.value.grandsons) || 0,
+      granddaughters: parseInt(descendantsTree.value.granddaughters) || 0,
+      greatGrandsons: parseInt(descendantsTree.value.greatGrandsons) || 0,
+      greatGranddaughters: parseInt(descendantsTree.value.greatGranddaughters) || 0
     });
   }
   else if (currentQuestion.value.type === 'ascendants_tree') {
@@ -275,22 +230,14 @@ const goBack = () => {
 
 // Obtenir la valeur de la réponse actuelle selon le type de question
 const getCurrentAnswerValue = () => {
-  if (currentQuestion.value.type === 'children_distribution') {
+  if (currentQuestion.value.type === 'descendants_tree') {
     return {
-      sons: parseInt(childrenDistribution.value.sons) || 0,
-      daughters: parseInt(childrenDistribution.value.daughters) || 0
-    };
-  }
-  else if (currentQuestion.value.type === 'grandchildren_distribution') {
-    return {
-      grandsons: parseInt(grandchildrenDistribution.value.grandsons) || 0,
-      granddaughters: parseInt(grandchildrenDistribution.value.granddaughters) || 0
-    };
-  }
-  else if (currentQuestion.value.type === 'great_grandchildren_distribution') {
-    return {
-      greatGrandsons: parseInt(greatGrandchildrenDistribution.value.greatGrandsons) || 0,
-      greatGranddaughters: parseInt(greatGrandchildrenDistribution.value.greatGranddaughters) || 0
+      sons: parseInt(descendantsTree.value.sons) || 0,
+      daughters: parseInt(descendantsTree.value.daughters) || 0,
+      grandsons: parseInt(descendantsTree.value.grandsons) || 0,
+      granddaughters: parseInt(descendantsTree.value.granddaughters) || 0,
+      greatGrandsons: parseInt(descendantsTree.value.greatGrandsons) || 0,
+      greatGranddaughters: parseInt(descendantsTree.value.greatGranddaughters) || 0
     };
   }
   else if (currentQuestion.value.type === 'ascendants_tree') {
@@ -301,17 +248,19 @@ const getCurrentAnswerValue = () => {
   }
 };
 
-
 // Réinitialiser les réponses pour une nouvelle question
 const resetAnswers = () => {
   currentAnswer.value = null;
-  childrenDistribution.value = { sons: '', daughters: '' };
-  grandchildrenDistribution.value = { grandsons: '', granddaughters: '' };
-  greatGrandchildrenDistribution.value = { greatGrandsons: '', greatGranddaughters: '' };
+  descendantsTree.value = {
+    sons: '0',
+    daughters: '0',
+    grandsons: '0',
+    granddaughters: '0',
+    greatGrandsons: '0',
+    greatGranddaughters: '0'
+  };
   ascendantsSelection.value = {};
-  childrenValidationError.value = '';
-  grandchildrenValidationError.value = '';
-  greatGrandchildrenValidationError.value = '';
+  descendantsValidationError.value = '';
 };
 
 // Soumettre la réponse actuelle et passer à la question suivante
