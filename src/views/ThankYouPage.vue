@@ -1,4 +1,4 @@
-<!-- src/views/ThankYouPage.vue -->
+<!-- src/views/ThankYouPage.vue - Mis à jour avec les neveux -->
 <template>
   <div class="min-h-screen bg-gradient-to-b from-emerald-50 to-teal-100 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
@@ -114,6 +114,35 @@
               </div>
               <div v-else class="empty-state">
                 Aucun frère ou sœur n'a été indiqué
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Neveux (Nouveau) -->
+          <div class="section-card" v-if="nephewsDataExists">
+            <div class="section-header">
+              <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <h4 class="section-title">Neveux</h4>
+            </div>
+
+            <div class="section-content">
+              <div v-if="hasNephews" class="nephews-grid">
+                <div v-if="nephewsData.fullBrothersSons > 0" class="nephew-item">
+                  <div class="nephew-count">{{ nephewsData.fullBrothersSons }}</div>
+                  <div class="nephew-type">{{ nephewsData.fullBrothersSons > 1 ? 'Fils des frères germains' : 'Fils de frère germain' }}</div>
+                </div>
+                <div v-if="nephewsData.halfBrothersPaternelSons > 0" class="nephew-item half-nephew">
+                  <div class="nephew-count">{{ nephewsData.halfBrothersPaternelSons }}</div>
+                  <div class="nephew-type">{{ nephewsData.halfBrothersPaternelSons > 1 ? 'Fils des demi-frères (père)' : 'Fils de demi-frère (père)' }}</div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                Aucun neveu n'a été indiqué
               </div>
             </div>
           </div>
@@ -246,6 +275,21 @@ const hasSiblings = computed(() =>
     siblingsData.value.halfSistersFather > 0 ||
     siblingsData.value.halfBrothersMother > 0 ||
     siblingsData.value.halfSistersMother > 0
+);
+
+// Neveux (nouveau)
+const nephewsData = computed(() => answers.value.nephews_details || {
+  fullBrothersSons: 0,
+  halfBrothersPaternelSons: 0
+});
+
+// Vérifier si les données sur les neveux existent
+const nephewsDataExists = computed(() => answers.value.nephews_details !== undefined);
+
+// Vérifier si au moins un neveu est présent
+const hasNephews = computed(() =>
+    nephewsData.value.fullBrothersSons > 0 ||
+    nephewsData.value.halfBrothersPaternelSons > 0
 );
 
 // Descendants
@@ -430,7 +474,7 @@ const startNew = () => {
   padding: 1rem;
 }
 
-.relatives-grid, .descendants-grid, .siblings-grid {
+.relatives-grid, .descendants-grid, .siblings-grid, .nephews-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 0.75rem;
@@ -449,25 +493,25 @@ const startNew = () => {
   font-size: 0.625rem;
 }
 
-.descendant-item, .sibling-item {
+.descendant-item, .sibling-item, .nephew-item {
   background-color: #f9fafb;
   border-radius: 0.5rem;
   padding: 0.75rem;
   text-align: center;
 }
 
-.sibling-item.half-sibling {
-  background-color: #f0f9ff; /* Un fond légèrement bleuté pour différencier les demi-frères/sœurs */
+.sibling-item.half-sibling, .nephew-item.half-nephew {
+  background-color: #f0f9ff; /* Un fond légèrement bleuté pour différencier les demi-frères/sœurs et neveux */
   border-left: 3px solid #3b82f6;
 }
 
-.descendant-count, .sibling-count {
+.descendant-count, .sibling-count, .nephew-count {
   font-size: 1.5rem;
   font-weight: 600;
   color: #047857;
 }
 
-.descendant-type, .sibling-type {
+.descendant-type, .sibling-type, .nephew-type {
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: 0.25rem;
@@ -483,15 +527,15 @@ const startNew = () => {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .relatives-grid, .descendants-grid, .siblings-grid {
+  .relatives-grid, .descendants-grid, .siblings-grid, .nephews-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 
-  .descendant-count, .sibling-count {
+  .descendant-count, .sibling-count, .nephew-count {
     font-size: 1.25rem;
   }
 
-  .descendant-type, .sibling-type {
+  .descendant-type, .sibling-type, .nephew-type {
     font-size: 0.7rem;
   }
 }

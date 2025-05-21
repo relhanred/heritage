@@ -1,4 +1,4 @@
-<!-- src/views/QuestionnairePage.vue -->
+<!-- src/views/QuestionnairePage.vue - Mise à jour avec l'arbre des neveux -->
 <template>
   <div class="min-h-screen bg-gradient-to-b from-emerald-50 to-teal-100 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
@@ -45,6 +45,15 @@
               :descendants="questionnaireStore.answers.descendants_tree || {}"
               :ascendants="questionnaireStore.answers.ascendants_details || {}"
               @update:validationError="siblingsValidationError = $event"
+          />
+
+          <NephewsTreeQuestion
+              v-else-if="currentQuestion.type === 'nephews_tree'"
+              :modelValue="nephewsTree"
+              @update:modelValue="nephewsTree = $event"
+              :gender="questionnaireStore.answers.deceased_gender"
+              :siblings="questionnaireStore.answers.siblings_details || {}"
+              @update:validationError="nephewsValidationError = $event"
           />
 
           <DescendantsTreeQuestion
@@ -103,6 +112,7 @@ import RadioQuestion from '@/components/questionnaire/QuestionTypes/RadioQuestio
 import InfoQuestion from '@/components/questionnaire/QuestionTypes/InfoQuestion.vue';
 import AscendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/AscendantsTreeQuestion.vue';
 import SiblingsTreeQuestion from '@/components/questionnaire/QuestionTypes/SiblingsTreeQuestion.vue';
+import NephewsTreeQuestion from '@/components/questionnaire/QuestionTypes/NephewsTreeQuestion.vue';
 import DescendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/DescendantsTreeQuestion.vue';
 import StructuredSummaryQuestion from '@/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue';
 
@@ -124,6 +134,10 @@ const siblingsTree = ref({
   halfBrothersMother: '0',
   halfSistersMother: '0'
 }); // Variable pour l'arbre des frères et sœurs
+const nephewsTree = ref({
+  fullBrothersSons: '0',
+  halfBrothersPaternelSons: '0'
+}); // Variable pour l'arbre des neveux
 const descendantsTree = ref({
   sons: '0',
   daughters: '0',
@@ -135,6 +149,7 @@ const descendantsTree = ref({
 
 // Messages d'erreur
 const siblingsValidationError = ref('');
+const nephewsValidationError = ref('');
 const descendantsValidationError = ref('');
 
 // Obtenir la question actuelle
@@ -154,6 +169,9 @@ const isAnswerValid = computed(() => {
   }
   else if (type === 'siblings_tree') {
     return !siblingsValidationError.value;
+  }
+  else if (type === 'nephews_tree') {
+    return !nephewsValidationError.value;
   }
   else if (type === 'descendants_tree') {
     return !descendantsValidationError.value;
@@ -210,6 +228,19 @@ const loadSavedAnswer = () => {
       };
     }
   }
+  else if (currentQuestion.value.type === 'nephews_tree') {
+    if (savedAnswer) {
+      nephewsTree.value = {
+        fullBrothersSons: savedAnswer.fullBrothersSons?.toString() || '0',
+        halfBrothersPaternelSons: savedAnswer.halfBrothersPaternelSons?.toString() || '0'
+      };
+    } else {
+      nephewsTree.value = {
+        fullBrothersSons: '0',
+        halfBrothersPaternelSons: '0'
+      };
+    }
+  }
   else if (currentQuestion.value.type === 'descendants_tree') {
     if (savedAnswer) {
       descendantsTree.value = {
@@ -262,6 +293,13 @@ const saveCurrentAnswer = () => {
       halfSistersMother: parseInt(siblingsTree.value.halfSistersMother) || 0
     });
   }
+  else if (currentQuestion.value.type === 'nephews_tree') {
+    // Sauvegarder l'arbre des neveux
+    questionnaireStore.saveAnswer(currentQuestion.value.id, {
+      fullBrothersSons: parseInt(nephewsTree.value.fullBrothersSons) || 0,
+      halfBrothersPaternelSons: parseInt(nephewsTree.value.halfBrothersPaternelSons) || 0
+    });
+  }
   else if (currentQuestion.value.type === 'descendants_tree') {
     // Sauvegarder l'arbre des descendants
     questionnaireStore.saveAnswer(currentQuestion.value.id, {
@@ -310,6 +348,12 @@ const getCurrentAnswerValue = () => {
       halfSistersMother: parseInt(siblingsTree.value.halfSistersMother) || 0
     };
   }
+  else if (currentQuestion.value.type === 'nephews_tree') {
+    return {
+      fullBrothersSons: parseInt(nephewsTree.value.fullBrothersSons) || 0,
+      halfBrothersPaternelSons: parseInt(nephewsTree.value.halfBrothersPaternelSons) || 0
+    };
+  }
   else if (currentQuestion.value.type === 'descendants_tree') {
     return {
       sons: parseInt(descendantsTree.value.sons) || 0,
@@ -339,6 +383,10 @@ const resetAnswers = () => {
     halfBrothersMother: '0',
     halfSistersMother: '0'
   };
+  nephewsTree.value = {
+    fullBrothersSons: '0',
+    halfBrothersPaternelSons: '0'
+  };
   descendantsTree.value = {
     sons: '0',
     daughters: '0',
@@ -349,6 +397,7 @@ const resetAnswers = () => {
   };
   ascendantsSelection.value = {};
   siblingsValidationError.value = '';
+  nephewsValidationError.value = '';
   descendantsValidationError.value = '';
 };
 

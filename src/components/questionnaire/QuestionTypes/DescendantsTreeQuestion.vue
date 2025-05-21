@@ -1,10 +1,6 @@
 <!-- src/components/questionnaire/QuestionTypes/DescendantsTreeQuestion.vue -->
 <template>
   <div class="space-y-4">
-    <div class="text-sm text-gray-600 mb-4 text-center">
-      Indiquez le nombre de descendants musulmans et légitimes pour chaque catégorie
-    </div>
-
     <!-- Arbre généalogique des descendants -->
     <div class="descendants-tree">
       <!-- Niveau 0: Défunt -->

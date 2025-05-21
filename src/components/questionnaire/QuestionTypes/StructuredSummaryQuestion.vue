@@ -1,4 +1,4 @@
-<!-- src/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue -->
+<!-- src/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue (Mis à jour) -->
 <template>
   <div class="space-y-4">
     <div class="text-sm text-gray-600 mb-4 text-center">
@@ -67,6 +67,24 @@
         </div>
         <div v-else class="info-item">
           <span class="info-value">Aucun frère ou sœur</span>
+        </div>
+      </div>
+
+      <!-- Neveux (nouveau) -->
+      <div class="summary-section" v-if="nephewsDataExists">
+        <h3 class="section-title">Neveux</h3>
+        <div v-if="hasNephews">
+          <div v-if="nephews.fullBrothersSons > 0" class="info-item">
+            <span class="info-label">Fils des frères germains:</span>
+            <span class="info-value">{{ nephews.fullBrothersSons }}</span>
+          </div>
+          <div v-if="nephews.halfBrothersPaternelSons > 0" class="info-item">
+            <span class="info-label">Fils des demi-frères (père):</span>
+            <span class="info-value">{{ nephews.halfBrothersPaternelSons }}</span>
+          </div>
+        </div>
+        <div v-else class="info-item">
+          <span class="info-value">Aucun neveu</span>
         </div>
       </div>
 
@@ -179,6 +197,23 @@ const hasSiblings = computed(() =>
     siblings.value.halfSistersFather > 0 ||
     siblings.value.halfBrothersMother > 0 ||
     siblings.value.halfSistersMother > 0
+);
+
+// Neveux (nouveau)
+const nephews = computed(() => answers.value.nephews_details || {
+  fullBrothersSons: 0,
+  halfBrothersPaternelSons: 0
+});
+
+// Vérifier si des données sur les neveux existent
+const nephewsDataExists = computed(() => {
+  return answers.value.nephews_details !== undefined;
+});
+
+// Vérifier si au moins un neveu est présent
+const hasNephews = computed(() =>
+    nephews.value.fullBrothersSons > 0 ||
+    nephews.value.halfBrothersPaternelSons > 0
 );
 
 // Descendants

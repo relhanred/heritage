@@ -1,10 +1,6 @@
 <!-- src/components/questionnaire/QuestionTypes/SiblingsTreeQuestion.vue -->
 <template>
   <div class="space-y-4">
-    <div class="text-sm text-gray-600 mb-4 text-center">
-      Veuillez indiquer le nombre de frères et sœurs du défunt
-    </div>
-
     <!-- Arbre généalogique des frères et sœurs -->
     <div class="siblings-tree">
       <!-- Niveau 0: Parents (non cliquables) -->

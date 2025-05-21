@@ -132,9 +132,46 @@ export const questionTree = {
     siblings_details: {
         id: 'siblings_details',
         getText: (answers) => answers.deceased_gender ?
-            'Veuillez indiquer le nombre de frères et sœurs du défunt :' :
-            'Veuillez indiquer le nombre de frères et sœurs de la défunte :',
+            'Veuillez indiquer le nombre de frères et sœurs musulmans et en vie du défunt :' :
+            'Veuillez indiquer le nombre de frères et sœurs musulmans et en vie de la défunte :',
         type: 'siblings_tree',
+        next: (answer, allAnswers) => {
+            // Vérifier si l'arbre des neveux doit être affiché
+
+            // Condition 1: Aucun frère (germain et consanguin)
+            const noPaternalBrothers = (answer.brothers === 0 && answer.halfBrothersFather === 0);
+
+            // Condition 2: Le défunt a au moins une descendante féminine (fille, petite-fille, arrière-petite-fille)
+            // ET au moins une sœur
+            const descendants = allAnswers.descendants_tree || {};
+            const hasFemaleDescendant = (
+                descendants.daughters > 0 ||
+                descendants.granddaughters > 0 ||
+                descendants.greatGranddaughters > 0
+            );
+            const hasSister = (
+                answer.sisters > 0 ||
+                answer.halfSistersFather > 0 ||
+                answer.halfSistersMother > 0
+            );
+            const femaleDescendantAndSister = hasFemaleDescendant && hasSister;
+
+            // Si l'une des conditions est remplie, montrer l'arbre des neveux
+            if (noPaternalBrothers && !femaleDescendantAndSister) {
+                return 'nephews_details';
+            } else {
+                return 'structured_summary';
+            }
+        }
+    },
+
+    // Arbre des neveux (après les frères et sœurs, affiché conditionnellement)
+    nephews_details: {
+        id: 'nephews_details',
+        getText: (answers) => answers.deceased_gender ?
+            'Veuillez indiquer le nombre de neveux musulmans et en vie du défunt :' :
+            'Veuillez indiquer le nombre de neveux musulmans et en vie de la défunte :',
+        type: 'nephews_tree',
         next: (answer) => 'structured_summary'
     },
 
