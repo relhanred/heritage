@@ -1,4 +1,4 @@
-// src/services/questionTreeService.js
+// src/services/questionTreeService.js (mise à jour)
 export const questionTree = {
     start: {
         id: 'deceased_gender',
@@ -160,7 +160,7 @@ export const questionTree = {
             if (noPaternalBrothers && !femaleDescendantAndSister) {
                 return 'nephews_details';
             } else {
-                // Nouvelle condition: Si aucun frère ni neveu, montrer l'arbre des oncles paternels
+                // Si aucun frère ni neveu, montrer l'arbre des oncles paternels
                 return 'uncles_details';
             }
         }
@@ -194,7 +194,28 @@ export const questionTree = {
             'Veuillez indiquer le nombre d\'oncles paternels musulmans et en vie du défunt :' :
             'Veuillez indiquer le nombre d\'oncles paternels musulmans et en vie de la défunte :',
         type: 'uncles_tree',
-        next: (answer) => 'structured_summary'
+        next: (answer) => {
+            // Vérifier si l'arbre des cousins paternels doit être affiché
+            const hasUncles = (
+                parseInt(answer.fatherFullBrothers) > 0 ||
+                parseInt(answer.fatherHalfBrothers) > 0
+            );
+
+            if (!hasUncles) {
+                return 'cousins_details'; // Si pas d'oncles, passer aux cousins paternels
+            }
+            return 'structured_summary'; // Sinon passer au résumé
+        }
+    },
+
+    // NOUVEL ARBRE: Cousins paternels (après les oncles si aucun oncle n'est présent)
+    cousins_details: {
+        id: 'cousins_details',
+        getText: (answers) => answers.deceased_gender ?
+            'Veuillez indiquer le nombre de cousins paternels musulmans et en vie du défunt :' :
+            'Veuillez indiquer le nombre de cousins paternels musulmans et en vie de la défunte :',
+        type: 'cousins_tree',
+        next: (answer) => 'structured_summary' // Après les cousins, passer au résumé
     },
 
     structured_summary: {

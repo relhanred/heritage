@@ -1,4 +1,4 @@
-<!-- src/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue (Mis à jour) -->
+<!-- src/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue (Ajout des cousins) -->
 <template>
   <div class="space-y-4">
     <div class="text-sm text-gray-600 mb-4 text-center">
@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <!-- Neveux (nouveau) -->
+      <!-- Neveux -->
       <div class="summary-section" v-if="nephewsDataExists">
         <h3 class="section-title">Neveux</h3>
         <div v-if="hasNephews">
@@ -88,7 +88,7 @@
         </div>
       </div>
 
-      <!-- Oncles Paternels (nouveau) -->
+      <!-- Oncles Paternels -->
       <div class="summary-section" v-if="unclesDataExists">
         <h3 class="section-title">Oncles Paternels</h3>
         <div v-if="hasUncles">
@@ -103,6 +103,24 @@
         </div>
         <div v-else class="info-item">
           <span class="info-value">Aucun oncle paternel</span>
+        </div>
+      </div>
+
+      <!-- Cousins Paternels (nouveau) -->
+      <div class="summary-section" v-if="cousinsDataExists">
+        <h3 class="section-title">Cousins Paternels</h3>
+        <div v-if="hasCousins">
+          <div v-if="cousins.fullUnclesSons > 0" class="info-item">
+            <span class="info-label">Fils des frères germains du père:</span>
+            <span class="info-value">{{ cousins.fullUnclesSons }}</span>
+          </div>
+          <div v-if="cousins.halfUnclesSons > 0" class="info-item">
+            <span class="info-label">Fils des demi-frères du père:</span>
+            <span class="info-value">{{ cousins.halfUnclesSons }}</span>
+          </div>
+        </div>
+        <div v-else class="info-item">
+          <span class="info-value">Aucun cousin paternel</span>
         </div>
       </div>
 
@@ -217,7 +235,7 @@ const hasSiblings = computed(() =>
     siblings.value.halfSistersMother > 0
 );
 
-// Neveux (nouveau)
+// Neveux
 const nephews = computed(() => answers.value.nephews_details || {
   fullBrothersSons: 0,
   halfBrothersPaternelSons: 0
@@ -234,7 +252,7 @@ const hasNephews = computed(() =>
     nephews.value.halfBrothersPaternelSons > 0
 );
 
-// Oncles paternels (nouveau)
+// Oncles paternels
 const uncles = computed(() => answers.value.uncles_details || {
   fatherFullBrothers: 0,
   fatherHalfBrothers: 0
@@ -249,6 +267,23 @@ const unclesDataExists = computed(() => {
 const hasUncles = computed(() =>
     uncles.value.fatherFullBrothers > 0 ||
     uncles.value.fatherHalfBrothers > 0
+);
+
+// Cousins paternels (nouveau)
+const cousins = computed(() => answers.value.cousins_details || {
+  fullUnclesSons: 0,
+  halfUnclesSons: 0
+});
+
+// Vérifier si des données sur les cousins paternels existent
+const cousinsDataExists = computed(() => {
+  return answers.value.cousins_details !== undefined;
+});
+
+// Vérifier si au moins un cousin paternel est présent
+const hasCousins = computed(() =>
+    cousins.value.fullUnclesSons > 0 ||
+    cousins.value.halfUnclesSons > 0
 );
 
 // Descendants

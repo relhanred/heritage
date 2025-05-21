@@ -1,4 +1,4 @@
-<!-- src/views/ThankYouPage.vue - Mis à jour avec les neveux -->
+<!-- src/views/ThankYouPage.vue - Mise à jour avec les cousins -->
 <template>
   <div class="min-h-screen bg-gradient-to-b from-emerald-50 to-teal-100 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
@@ -118,7 +118,7 @@
             </div>
           </div>
 
-          <!-- Section Neveux (Nouveau) -->
+          <!-- Section Neveux -->
           <div class="section-card" v-if="nephewsDataExists">
             <div class="section-header">
               <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -143,6 +143,64 @@
               </div>
               <div v-else class="empty-state">
                 Aucun neveu n'a été indiqué
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Oncles Paternels -->
+          <div class="section-card" v-if="unclesDataExists">
+            <div class="section-header">
+              <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <h4 class="section-title">Oncles Paternels</h4>
+            </div>
+
+            <div class="section-content">
+              <div v-if="hasUncles" class="uncles-grid">
+                <div v-if="unclesData.fatherFullBrothers > 0" class="uncle-item">
+                  <div class="uncle-count">{{ unclesData.fatherFullBrothers }}</div>
+                  <div class="uncle-type">{{ unclesData.fatherFullBrothers > 1 ? 'Frères germains du père' : 'Frère germain du père' }}</div>
+                </div>
+                <div v-if="unclesData.fatherHalfBrothers > 0" class="uncle-item half-uncle">
+                  <div class="uncle-count">{{ unclesData.fatherHalfBrothers }}</div>
+                  <div class="uncle-type">{{ unclesData.fatherHalfBrothers > 1 ? 'Demi-frères du père' : 'Demi-frère du père' }}</div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                Aucun oncle paternel n'a été indiqué
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Cousins Paternels (nouveau) -->
+          <div class="section-card" v-if="cousinsDataExists">
+            <div class="section-header">
+              <svg xmlns="http://www.w3.org/2000/svg" class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <h4 class="section-title">Cousins Paternels</h4>
+            </div>
+
+            <div class="section-content">
+              <div v-if="hasCousins" class="cousins-grid">
+                <div v-if="cousinsData.fullUnclesSons > 0" class="cousin-item">
+                  <div class="cousin-count">{{ cousinsData.fullUnclesSons }}</div>
+                  <div class="cousin-type">{{ cousinsData.fullUnclesSons > 1 ? 'Fils des frères germains du père' : 'Fils de frère germain du père' }}</div>
+                </div>
+                <div v-if="cousinsData.halfUnclesSons > 0" class="cousin-item half-cousin">
+                  <div class="cousin-count">{{ cousinsData.halfUnclesSons }}</div>
+                  <div class="cousin-type">{{ cousinsData.halfUnclesSons > 1 ? 'Fils des demi-frères du père' : 'Fils de demi-frère du père' }}</div>
+                </div>
+              </div>
+              <div v-else class="empty-state">
+                Aucun cousin paternel n'a été indiqué
               </div>
             </div>
           </div>
@@ -273,7 +331,7 @@ const hasSiblings = computed(() =>
     siblingsData.value.halfSistersMother > 0
 );
 
-// Neveux (nouveau)
+// Neveux
 const nephewsData = computed(() => answers.value.nephews_details || {
   fullBrothersSons: 0,
   halfBrothersPaternelSons: 0
@@ -286,6 +344,36 @@ const nephewsDataExists = computed(() => answers.value.nephews_details !== undef
 const hasNephews = computed(() =>
     nephewsData.value.fullBrothersSons > 0 ||
     nephewsData.value.halfBrothersPaternelSons > 0
+);
+
+// Oncles paternels
+const unclesData = computed(() => answers.value.uncles_details || {
+  fatherFullBrothers: 0,
+  fatherHalfBrothers: 0
+});
+
+// Vérifier si les données sur les oncles paternels existent
+const unclesDataExists = computed(() => answers.value.uncles_details !== undefined);
+
+// Vérifier si au moins un oncle paternel est présent
+const hasUncles = computed(() =>
+    unclesData.value.fatherFullBrothers > 0 ||
+    unclesData.value.fatherHalfBrothers > 0
+);
+
+// Cousins paternels (nouveau)
+const cousinsData = computed(() => answers.value.cousins_details || {
+  fullUnclesSons: 0,
+  halfUnclesSons: 0
+});
+
+// Vérifier si les données sur les cousins paternels existent
+const cousinsDataExists = computed(() => answers.value.cousins_details !== undefined);
+
+// Vérifier si au moins un cousin paternel est présent
+const hasCousins = computed(() =>
+    cousinsData.value.fullUnclesSons > 0 ||
+    cousinsData.value.halfUnclesSons > 0
 );
 
 // Descendants
@@ -470,7 +558,7 @@ const startNew = () => {
   padding: 1rem;
 }
 
-.relatives-grid, .descendants-grid, .siblings-grid, .nephews-grid {
+.relatives-grid, .descendants-grid, .siblings-grid, .nephews-grid, .uncles-grid, .cousins-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 0.75rem;
@@ -489,25 +577,25 @@ const startNew = () => {
   font-size: 0.625rem;
 }
 
-.descendant-item, .sibling-item, .nephew-item {
+.descendant-item, .sibling-item, .nephew-item, .uncle-item, .cousin-item {
   background-color: #f9fafb;
   border-radius: 0.5rem;
   padding: 0.75rem;
   text-align: center;
 }
 
-.sibling-item.half-sibling, .nephew-item.half-nephew {
-  background-color: #f0f9ff; /* Un fond légèrement bleuté pour différencier les demi-frères/sœurs et neveux */
+.sibling-item.half-sibling, .nephew-item.half-nephew, .uncle-item.half-uncle, .cousin-item.half-cousin {
+  background-color: #f0f9ff; /* Un fond légèrement bleuté pour différencier les demi-relations */
   border-left: 3px solid #3b82f6;
 }
 
-.descendant-count, .sibling-count, .nephew-count {
+.descendant-count, .sibling-count, .nephew-count, .uncle-count, .cousin-count {
   font-size: 1.5rem;
   font-weight: 600;
   color: #047857;
 }
 
-.descendant-type, .sibling-type, .nephew-type {
+.descendant-type, .sibling-type, .nephew-type, .uncle-type, .cousin-type {
   font-size: 0.75rem;
   color: #6b7280;
   margin-top: 0.25rem;
@@ -523,15 +611,15 @@ const startNew = () => {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .relatives-grid, .descendants-grid, .siblings-grid, .nephews-grid {
+  .relatives-grid, .descendants-grid, .siblings-grid, .nephews-grid, .uncles-grid, .cousins-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 
-  .descendant-count, .sibling-count, .nephew-count {
+  .descendant-count, .sibling-count, .nephew-count, .uncle-count, .cousin-count {
     font-size: 1.25rem;
   }
 
-  .descendant-type, .sibling-type, .nephew-type {
+  .descendant-type, .sibling-type, .nephew-type, .uncle-type, .cousin-type {
     font-size: 0.7rem;
   }
 }
