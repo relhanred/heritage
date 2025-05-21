@@ -31,7 +31,7 @@
         <!-- Frères germains du père à droite -->
         <div class="right-branch">
           <div class="tree-node input-node uncle-node">
-            <div class="node-label">Frères germains du père</div>
+            <div class="node-label">Frères germains du père (même père et mère)</div>
             <input
                 type="number"
                 v-model="modelValue.fatherFullBrothers"
@@ -264,15 +264,15 @@ watch(() => props.modelValue, validateInput, { deep: true });
 }
 
 .tree-node.parent-node {
-  border-color: #6366f1;  /* Violet pour le père */
-  background-color: #f5f3ff;
+  border-color: #9ca3af;  /* Même bordure que le défunt */
+  background-color: #f3f4f6;  /* Même fond que le défunt */
   font-weight: 500;
   cursor: default;
 }
 
 .tree-node.input-node {
-  border-color: #3b82f6;  /* Bleu pour les oncles */
-  background-color: #f0f9ff;
+  border-color: #047857;  /* Vert pour les oncles */
+  background-color: white;
   height: 80px;  /* Hauteur fixe pour les cards des oncles */
   display: flex;
   flex-direction: column;

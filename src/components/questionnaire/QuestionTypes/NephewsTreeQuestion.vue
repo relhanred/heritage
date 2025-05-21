@@ -304,9 +304,10 @@ watch(() => props.modelValue, validateInput, { deep: true });
   font-size: 0.9rem;
 }
 
+
 .tree-node.info-node {
-  border-color: #3b82f6;
-  background-color: #f0f9ff;
+  border-color: #9ca3af;  /* Même bordure que le défunt */
+  background-color: #f3f4f6;  /* Même fond que le défunt */
   cursor: default;
   height: 80px;  /* Hauteur fixe pour les cards des frères */
   display: flex;
@@ -340,7 +341,7 @@ watch(() => props.modelValue, validateInput, { deep: true });
 
 .node-count {
   font-weight: 600;
-  color: #3b82f6;
+  color: #9ca3af;
   font-size: 1.1rem;
 }
 
