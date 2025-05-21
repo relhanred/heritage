@@ -3,50 +3,63 @@
   <div class="space-y-4">
     <!-- Arbre généalogique des cousins paternels -->
     <div class="cousins-tree">
-      <!-- Niveau 0: Grand-père paternel (non affiché mais implicite) -->
-      <!-- Niveau 1: Père et ses frères -->
-      <div class="tree-level level-0">
-        <!-- Demi-frères du père (même père) à gauche -->
-        <div class="left-branch">
-          <div class="tree-node info-node uncle-node">
+      <!-- Niveau 1: Grand-père paternel (ancêtre commun) -->
+      <div class="tree-level level-ancestor">
+        <div class="ancestor-node">
+          <div class="tree-node ancestor">Grand-père paternel</div>
+        </div>
+      </div>
+
+      <!-- Connecteur du grand-père vers ses fils -->
+      <div class="tree-connectors grandfather-to-sons">
+        <!-- Ligne verticale centrale descendant du grand-père -->
+        <div class="main-vertical-line"></div>
+        <!-- Ligne horizontale reliant tous les fils -->
+        <div class="horizontal-line"></div>
+        <!-- Lignes verticales vers chaque fils -->
+        <div class="vertical-branches">
+          <div class="branch left"></div>
+          <div class="branch center"></div>
+          <div class="branch right"></div>
+        </div>
+      </div>
+
+      <!-- Niveau 2: Père et ses frères (oncles paternels) sur la même ligne -->
+      <div class="tree-level level-parents">
+        <!-- Demi-frères du père (même père) -->
+        <div class="uncle-node">
+          <div class="tree-node info-node">
             <div class="node-label">Demi-frères du père (même père)</div>
             <div class="node-count">{{ unclesCount.fatherHalfBrothers }}</div>
           </div>
         </div>
 
         <!-- Père au centre -->
-        <div class="center-branch">
-          <div class="tree-node parent-node center-node">
+        <div class="father-node">
+          <div class="tree-node parent-node">
             Père du défunt
           </div>
         </div>
 
-        <!-- Frères germains du père à droite -->
-        <div class="right-branch">
-          <div class="tree-node info-node uncle-node">
-            <div class="node-label">Frères germains du père (même père et mère)</div>
+        <!-- Frères germains du père -->
+        <div class="uncle-node">
+          <div class="tree-node info-node">
+            <div class="node-label">Frères germains du père</div>
             <div class="node-count">{{ unclesCount.fatherFullBrothers }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Connecteurs horizontaux pour relier le père aux frères -->
-      <div class="horizontal-connectors">
-        <div class="connector-line-horizontal left"></div>
-        <div class="connector-line-horizontal right"></div>
+      <!-- Connecteurs de niveau 2 à 3 -->
+      <div class="tree-connectors parents-to-children">
+        <div class="vertical-line left"></div>
+        <div class="vertical-line right"></div>
       </div>
 
-      <!-- Connecteurs verticaux des oncles aux cousins -->
-      <div class="vertical-connectors">
-        <div class="connector-line-vertical left"></div>
-        <div class="connector-line-vertical center"></div>
-        <div class="connector-line-vertical right"></div>
-      </div>
-
-      <!-- Niveau 2: Défunt et Cousins -->
-      <div class="tree-level level-1">
-        <!-- Fils des demi-frères du père (cousins du côté paternel) -->
-        <div class="left-branch">
+      <!-- Niveau 3: Défunt et cousins sur la même ligne -->
+      <div class="tree-level level-children">
+        <!-- Fils des demi-frères du père (cousins) -->
+        <div class="cousin-column">
           <div class="tree-node input-node cousin-node">
             <div class="node-label">Fils des demi-frères du père</div>
             <input
@@ -61,14 +74,14 @@
         </div>
 
         <!-- Défunt au centre -->
-        <div class="center-branch">
+        <div class="deceased-column">
           <div class="tree-node deceased">
             {{ deceasedLabel }}
           </div>
         </div>
 
-        <!-- Fils des frères germains du père (cousins du côté paternel) -->
-        <div class="right-branch">
+        <!-- Fils des frères germains du père (cousins) -->
+        <div class="cousin-column">
           <div class="tree-node input-node cousin-node">
             <div class="node-label">Fils des frères germains du père</div>
             <input
@@ -189,166 +202,216 @@ watch(() => props.modelValue, validateInput, { deep: true });
   display: flex;
   flex-direction: column;
   position: relative;
-  margin: 40px 0;
+  margin: 20px 0 80px;
+  padding: 20px 10px 40px;
   max-width: 100%;
-  padding: 10px 5px 100px;
 }
 
+/* Niveau de l'ancêtre (grand-père paternel) */
+.level-ancestor {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.ancestor-node {
+  display: flex;
+  justify-content: center;
+}
+
+.tree-node.ancestor {
+  background-color: #f3f4f6;
+  border: 1.5px solid #6b7280;
+  color: #4b5563;
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 7px 12px;
+  z-index: 3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Connecteurs du grand-père aux fils */
+.grandfather-to-sons {
+  position: relative;
+  height: 40px;
+}
+
+.main-vertical-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 20px;
+  width: 1px;
+  background-color: #9ca3af;
+  transform: translateX(-50%);
+}
+
+.horizontal-line {
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  top: 20px;
+  height: 1px;
+  background-color: #9ca3af;
+}
+
+.vertical-branches {
+  position: absolute;
+  width: 100%;
+  top: 20px;
+  height: 20px;
+}
+
+.branch {
+  position: absolute;
+  width: 1px;
+  height: 20px;
+  background-color: #9ca3af;
+}
+
+.branch.left {
+  left: 16%;
+}
+
+.branch.center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.branch.right {
+  right: 16%;
+}
+
+/* Niveaux de l'arbre */
 .tree-level {
   display: flex;
   justify-content: space-around;
   width: 100%;
   position: relative;
+  margin: 15px 0;
 }
 
-/* Niveau du père et frères sur la même ligne */
-.level-0 {
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 60px;
-}
-
-/* Niveau du défunt et cousins */
-.level-1 {
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  margin-top: 20px;  /* Espacement après les connecteurs verticaux */
-}
-
-.left-branch, .right-branch {
+/* Niveau des parents (père et oncles) */
+.level-parents {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 35%;  /* Taille égale pour les deux branches */
-  position: relative;
+  justify-content: space-around;
+  padding: 0 20px;
 }
 
-.center-branch {
-  width: 25%;  /* Légèrement plus large pour le centre */
+.uncle-node, .father-node {
+  flex: 1;
   display: flex;
   justify-content: center;
+  margin: 0 5px;
 }
 
-/* Connecteurs horizontaux reliant le père aux frères */
-.horizontal-connectors {
-  position: absolute;
-  top: 35px;
+.father-node {
+  /* Le père est mis en évidence au centre */
+  z-index: 2;
+}
+
+/* Niveau des enfants (défunt et cousins) */
+.level-children {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 5px;
+  padding: 0 20px;
+}
+
+.cousin-column, .deceased-column {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 0 5px;
+}
+
+.deceased-column {
+  /* Le défunt est mis en évidence au centre */
+  z-index: 2;
+}
+
+/* Connecteurs entre les parents et les enfants */
+.parents-to-children {
   width: 100%;
-  height: 1px;
-  z-index: 0;
+  position: relative;
+  height: 30px;
 }
 
-.connector-line-horizontal {
-  position: absolute;
-  height: 1px;
-  background-color: #9ca3af;
-  top: 0;
-  width: 17.5%;  /* Exactement la moitié de la largeur des branches (35%/2) */
-}
-
-.connector-line-horizontal.left {
-  left: 25%;  /* Aligné avec le centre de la branche gauche */
-  right: auto;
-}
-
-.connector-line-horizontal.right {
-  right: 25%;  /* Aligné avec le centre de la branche droite */
-  left: auto;
-}
-
-/* Connecteurs verticaux vers les cousins et le défunt */
-.vertical-connectors {
-  position: absolute;
-  top: 90px;  /* Ajusté pour commencer après les cards des oncles */
-  width: 100%;
-  z-index: 0;
-}
-
-.connector-line-vertical {
+.vertical-line {
   position: absolute;
   width: 1px;
-  height: 40px;  /* Hauteur égale pour tous les connecteurs */
   background-color: #9ca3af;
+  height: 30px;
 }
 
-.connector-line-vertical.left {
-  left: 25%;  /* Aligné avec le centre de la branche gauche */
+.vertical-line.left {
+  left: 16%;
 }
 
-.connector-line-vertical.center {
-  left: 50%;  /* Aligné avec le centre */
+.vertical-line.center {
+  left: 50%;
   transform: translateX(-50%);
 }
 
-.connector-line-vertical.right {
-  right: 25%;  /* Aligné avec le centre de la branche droite */
+.vertical-line.right {
+  right: 16%;
 }
 
+/* Styles de base des nœuds */
 .tree-node {
   padding: 10px 15px;
-  border: 1.5px solid #047857;
   border-radius: 12px;
   background-color: white;
   color: #4b5563;
   text-align: center;
-  min-width: 120px;  /* Taille minimale égale pour toutes les cards */
-  width: 90%;       /* Largeur en pourcentage pour s'adapter au contenant */
-  max-width: 200px;  /* Largeur maximale pour éviter des cards trop larges */
-  transition: all 0.2s;
+  min-width: 120px;
+  width: 90%;
+  max-width: 180px;
   font-size: 0.8rem;
-  z-index: 2;
   position: relative;
-  box-sizing: border-box;  /* Pour que le padding soit inclus dans la largeur */
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Nœud du défunt */
 .tree-node.deceased {
   background-color: #f3f4f6;
-  border-color: #9ca3af;
-  cursor: default;
+  border: 1.5px solid #9ca3af;
   font-weight: 500;
   font-size: 0.9rem;
 }
 
+/* Nœud du père */
 .tree-node.parent-node {
-  border-color: #9ca3af;  /* Même bordure que le défunt */
-  background-color: #f3f4f6;  /* Même fond que le défunt */
+  border: 1.5px solid #9ca3af;
+  background-color: #f3f4f6;
   font-weight: 500;
-  cursor: default;
 }
 
+/* Nœuds d'information (oncles) */
 .tree-node.info-node {
-  border-color: #9ca3af;  /* Gris pour les oncles en lecture seule */
-  background-color: #f3f4f6;  /* Même fond que le défunt */
-  cursor: default;
-  height: 80px;  /* Hauteur fixe pour les cards des oncles */
+  border: 1.5px solid #9ca3af;
+  background-color: #f3f4f6;
+  height: 80px;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centrage vertical du contenu */
+  justify-content: center;
 }
 
-.tree-node.uncle-node {
-  margin: 0 5px;
-}
-
+/* Nœuds d'entrée de données (cousins) */
 .tree-node.input-node {
-  border-color: #047857;  /* Vert pour les cousins */
-  background-color: white;
-  height: 80px;  /* Hauteur fixe pour les cards des cousins */
+  border: 1.5px solid #047857;
+  height: 80px;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centrage vertical du contenu */
+  justify-content: center;
 }
 
-.tree-node.cousin-node {
+.cousin-node {
   z-index: 1;
-  margin-top: 15px;
 }
 
-.center-node {
-  margin: 0 auto;
-}
-
+/* Étiquettes et compteurs */
 .node-label {
   font-size: 0.75rem;
   margin-bottom: 5px;
@@ -369,16 +432,16 @@ watch(() => props.modelValue, validateInput, { deep: true });
   border-radius: 4px;
   text-align: center;
   font-size: 0.8rem;
-  margin-top: 2px;
+  margin: 5px auto 0;
 }
 
 /* Cadre pointillé des cousins */
 .cousins-box {
   position: absolute;
-  bottom: 0;
-  left: 10%;
-  right: 10%;
-  height: 45%;  /* Ajusté pour bien englober les deux cards des cousins */
+  bottom: 25px;
+  left: 5%;
+  right: 5%;
+  height: 30%;
   border: 1px dashed #9ca3af;
   border-radius: 8px;
   z-index: 0;
@@ -406,37 +469,44 @@ watch(() => props.modelValue, validateInput, { deep: true });
 /* Responsive */
 @media (max-width: 640px) {
   .cousins-tree {
-    padding: 10px 5px 120px;
+    padding: 20px 10px 120px;
   }
 
-  .level-0 {
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
-  }
-
-  .level-1 {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .left-branch, .right-branch, .center-branch {
-    width: 80%;
-    margin: 10px 0;
-  }
-
-  .horizontal-connectors,
-  .vertical-connectors {
+  .horizontal-line, .vertical-branches, .main-vertical-line {
     display: none;
   }
 
-  .tree-node.cousin-node {
-    margin-top: 0;
+  .cousin-column, .deceased-column {
+    flex: none;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .level-parents, .level-children {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .uncle-node, .father-node {
+    flex: none;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .vertical-line {
+    display: none;
   }
 
   .cousins-box {
-    height: 60%;
+    height: 65%;
+    top: auto;
     bottom: 0;
+  }
+
+  .tree-node {
+    max-width: 240px;
+    width: 100%;
   }
 }
 </style>

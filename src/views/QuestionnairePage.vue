@@ -2,7 +2,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-emerald-50 to-teal-100 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-      <div class="p-8">
+      <div class="p-6">
         <div class="flex items-center mb-6">
           <h1 class="text-xl font-semibold text-gray-900 flex-grow text-center">Questionnaire d'héritage</h1>
         </div>
