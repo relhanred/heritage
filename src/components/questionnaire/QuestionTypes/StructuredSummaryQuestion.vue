@@ -88,6 +88,24 @@
         </div>
       </div>
 
+      <!-- Oncles Paternels (nouveau) -->
+      <div class="summary-section" v-if="unclesDataExists">
+        <h3 class="section-title">Oncles Paternels</h3>
+        <div v-if="hasUncles">
+          <div v-if="uncles.fatherFullBrothers > 0" class="info-item">
+            <span class="info-label">Frères germains du père:</span>
+            <span class="info-value">{{ uncles.fatherFullBrothers }}</span>
+          </div>
+          <div v-if="uncles.fatherHalfBrothers > 0" class="info-item">
+            <span class="info-label">Demi-frères du père (même grand-père):</span>
+            <span class="info-value">{{ uncles.fatherHalfBrothers }}</span>
+          </div>
+        </div>
+        <div v-else class="info-item">
+          <span class="info-value">Aucun oncle paternel</span>
+        </div>
+      </div>
+
       <!-- Descendants vivants -->
       <div class="summary-section">
         <h3 class="section-title">Descendants</h3>
@@ -214,6 +232,23 @@ const nephewsDataExists = computed(() => {
 const hasNephews = computed(() =>
     nephews.value.fullBrothersSons > 0 ||
     nephews.value.halfBrothersPaternelSons > 0
+);
+
+// Oncles paternels (nouveau)
+const uncles = computed(() => answers.value.uncles_details || {
+  fatherFullBrothers: 0,
+  fatherHalfBrothers: 0
+});
+
+// Vérifier si des données sur les oncles paternels existent
+const unclesDataExists = computed(() => {
+  return answers.value.uncles_details !== undefined;
+});
+
+// Vérifier si au moins un oncle paternel est présent
+const hasUncles = computed(() =>
+    uncles.value.fatherFullBrothers > 0 ||
+    uncles.value.fatherHalfBrothers > 0
 );
 
 // Descendants

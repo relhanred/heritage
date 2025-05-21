@@ -195,10 +195,6 @@
           </div>
         </div>
 
-        <p class="text-xs text-gray-500 italic mb-6">
-          Un email contenant ces informations et le calcul de la répartition de l'héritage sera envoyé à {{ email }}
-        </p>
-
         <button
             @click="startNew"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"

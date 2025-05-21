@@ -56,6 +56,14 @@
               @update:validationError="nephewsValidationError = $event"
           />
 
+          <UnclesTreeQuestion
+              v-else-if="currentQuestion.type === 'uncles_tree'"
+              :modelValue="unclesTree"
+              @update:modelValue="unclesTree = $event"
+              :gender="questionnaireStore.answers.deceased_gender"
+              @update:validationError="unclesValidationError = $event"
+          />
+
           <DescendantsTreeQuestion
               v-else-if="currentQuestion.type === 'descendants_tree'"
               :modelValue="descendantsTree"
@@ -113,6 +121,7 @@ import InfoQuestion from '@/components/questionnaire/QuestionTypes/InfoQuestion.
 import AscendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/AscendantsTreeQuestion.vue';
 import SiblingsTreeQuestion from '@/components/questionnaire/QuestionTypes/SiblingsTreeQuestion.vue';
 import NephewsTreeQuestion from '@/components/questionnaire/QuestionTypes/NephewsTreeQuestion.vue';
+import UnclesTreeQuestion from '@/components/questionnaire/QuestionTypes/UnclesTreeQuestion.vue';
 import DescendantsTreeQuestion from '@/components/questionnaire/QuestionTypes/DescendantsTreeQuestion.vue';
 import StructuredSummaryQuestion from '@/components/questionnaire/QuestionTypes/StructuredSummaryQuestion.vue';
 
@@ -138,6 +147,10 @@ const nephewsTree = ref({
   fullBrothersSons: '0',
   halfBrothersPaternelSons: '0'
 }); // Variable pour l'arbre des neveux
+const unclesTree = ref({
+  fatherFullBrothers: '0',
+  fatherHalfBrothers: '0'
+}); // Variable pour l'arbre des oncles paternels
 const descendantsTree = ref({
   sons: '0',
   daughters: '0',
@@ -150,6 +163,7 @@ const descendantsTree = ref({
 // Messages d'erreur
 const siblingsValidationError = ref('');
 const nephewsValidationError = ref('');
+const unclesValidationError = ref('');
 const descendantsValidationError = ref('');
 
 // Obtenir la question actuelle
@@ -172,6 +186,9 @@ const isAnswerValid = computed(() => {
   }
   else if (type === 'nephews_tree') {
     return !nephewsValidationError.value;
+  }
+  else if (type === 'uncles_tree') {
+    return !unclesValidationError.value;
   }
   else if (type === 'descendants_tree') {
     return !descendantsValidationError.value;
@@ -241,6 +258,19 @@ const loadSavedAnswer = () => {
       };
     }
   }
+  else if (currentQuestion.value.type === 'uncles_tree') {
+    if (savedAnswer) {
+      unclesTree.value = {
+        fatherFullBrothers: savedAnswer.fatherFullBrothers?.toString() || '0',
+        fatherHalfBrothers: savedAnswer.fatherHalfBrothers?.toString() || '0'
+      };
+    } else {
+      unclesTree.value = {
+        fatherFullBrothers: '0',
+        fatherHalfBrothers: '0'
+      };
+    }
+  }
   else if (currentQuestion.value.type === 'descendants_tree') {
     if (savedAnswer) {
       descendantsTree.value = {
@@ -300,6 +330,13 @@ const saveCurrentAnswer = () => {
       halfBrothersPaternelSons: parseInt(nephewsTree.value.halfBrothersPaternelSons) || 0
     });
   }
+  else if (currentQuestion.value.type === 'uncles_tree') {
+    // Sauvegarder l'arbre des oncles paternels
+    questionnaireStore.saveAnswer(currentQuestion.value.id, {
+      fatherFullBrothers: parseInt(unclesTree.value.fatherFullBrothers) || 0,
+      fatherHalfBrothers: parseInt(unclesTree.value.fatherHalfBrothers) || 0
+    });
+  }
   else if (currentQuestion.value.type === 'descendants_tree') {
     // Sauvegarder l'arbre des descendants
     questionnaireStore.saveAnswer(currentQuestion.value.id, {
@@ -354,6 +391,12 @@ const getCurrentAnswerValue = () => {
       halfBrothersPaternelSons: parseInt(nephewsTree.value.halfBrothersPaternelSons) || 0
     };
   }
+  else if (currentQuestion.value.type === 'uncles_tree') {
+    return {
+      fatherFullBrothers: parseInt(unclesTree.value.fatherFullBrothers) || 0,
+      fatherHalfBrothers: parseInt(unclesTree.value.fatherHalfBrothers) || 0
+    };
+  }
   else if (currentQuestion.value.type === 'descendants_tree') {
     return {
       sons: parseInt(descendantsTree.value.sons) || 0,
@@ -387,6 +430,10 @@ const resetAnswers = () => {
     fullBrothersSons: '0',
     halfBrothersPaternelSons: '0'
   };
+  unclesTree.value = {
+    fatherFullBrothers: '0',
+    fatherHalfBrothers: '0'
+  };
   descendantsTree.value = {
     sons: '0',
     daughters: '0',
@@ -398,6 +445,7 @@ const resetAnswers = () => {
   ascendantsSelection.value = {};
   siblingsValidationError.value = '';
   nephewsValidationError.value = '';
+  unclesValidationError.value = '';
   descendantsValidationError.value = '';
 };
 
