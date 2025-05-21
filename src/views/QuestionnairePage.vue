@@ -42,6 +42,8 @@
               :modelValue="siblingsTree"
               @update:modelValue="siblingsTree = $event"
               :gender="questionnaireStore.answers.deceased_gender"
+              :descendants="questionnaireStore.answers.descendants_tree || {}"
+              :ascendants="questionnaireStore.answers.ascendants_details || {}"
               @update:validationError="siblingsValidationError = $event"
           />
 

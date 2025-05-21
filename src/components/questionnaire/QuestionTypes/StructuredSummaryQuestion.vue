@@ -56,11 +56,11 @@
             <span class="info-label">Demi-sœurs (père):</span>
             <span class="info-value">{{ siblings.halfSistersFather }}</span>
           </div>
-          <div v-if="siblings.halfBrothersMother > 0" class="info-item">
+          <div v-if="siblings.halfBrothersMother > 0 && shouldShowMaternalHalfSiblings" class="info-item">
             <span class="info-label">Demi-frères (mère):</span>
             <span class="info-value">{{ siblings.halfBrothersMother }}</span>
           </div>
-          <div v-if="siblings.halfSistersMother > 0" class="info-item">
+          <div v-if="siblings.halfSistersMother > 0 && shouldShowMaternalHalfSiblings" class="info-item">
             <span class="info-label">Demi-sœurs (mère):</span>
             <span class="info-value">{{ siblings.halfSistersMother }}</span>
           </div>
@@ -195,6 +195,27 @@ const hasDescendants = computed(() =>
     sons.value > 0 || daughters.value > 0 || grandsons.value > 0 ||
     granddaughters.value > 0 || greatGrandsons.value > 0 || greatGranddaughters.value > 0
 );
+
+// Vérifier si on doit afficher les demi-frères/sœurs du côté maternel
+const shouldShowMaternalHalfSiblings = computed(() => {
+  // Vérifier s'il n'y a aucun descendant
+  const hasNoDescendants = !hasDescendants.value;
+
+  // Extraire les données sur les ascendants vivants
+  const ascendantsData = answers.value.ascendants_details || {};
+
+  // Vérifier s'il n'y a aucun ascendant masculin
+  const hasNoMaleAscendants =
+      ascendantsData.father !== true &&
+      ascendantsData.paternal_grandfather !== true &&
+      ascendantsData.paternal_great_grandfather_1 !== true &&
+      ascendantsData.paternal_great_grandfather_2 !== true &&
+      ascendantsData.maternal_great_grandfather_1 !== true &&
+      ascendantsData.maternal_great_grandfather_2 !== true;
+
+  // Afficher uniquement si les deux conditions sont remplies
+  return hasNoDescendants && hasNoMaleAscendants;
+});
 </script>
 
 <style scoped>

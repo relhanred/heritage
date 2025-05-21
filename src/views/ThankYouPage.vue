@@ -103,11 +103,11 @@
                   <div class="sibling-count">{{ siblingsData.halfSistersFather }}</div>
                   <div class="sibling-type">{{ siblingsData.halfSistersFather > 1 ? 'Demi-sœurs (père)' : 'Demi-sœur (père)' }}</div>
                 </div>
-                <div v-if="siblingsData.halfBrothersMother > 0" class="sibling-item half-sibling">
+                <div v-if="siblingsData.halfBrothersMother > 0 && shouldShowMaternalHalfSiblings" class="sibling-item half-sibling">
                   <div class="sibling-count">{{ siblingsData.halfBrothersMother }}</div>
                   <div class="sibling-type">{{ siblingsData.halfBrothersMother > 1 ? 'Demi-frères (mère)' : 'Demi-frère (mère)' }}</div>
                 </div>
-                <div v-if="siblingsData.halfSistersMother > 0" class="sibling-item half-sibling">
+                <div v-if="siblingsData.halfSistersMother > 0 && shouldShowMaternalHalfSiblings" class="sibling-item half-sibling">
                   <div class="sibling-count">{{ siblingsData.halfSistersMother }}</div>
                   <div class="sibling-type">{{ siblingsData.halfSistersMother > 1 ? 'Demi-sœurs (mère)' : 'Demi-sœur (mère)' }}</div>
                 </div>
@@ -262,6 +262,27 @@ const hasDescendants = computed(() =>
     sons.value > 0 || daughters.value > 0 || grandsons.value > 0 ||
     granddaughters.value > 0 || greatGrandsons.value > 0 || greatGranddaughters.value > 0
 );
+
+// Vérifier si on doit afficher les demi-frères/sœurs du côté maternel
+const shouldShowMaternalHalfSiblings = computed(() => {
+  // Vérifier s'il n'y a aucun descendant
+  const hasNoDescendants = !hasDescendants.value;
+
+  // Extraire les données sur les ascendants vivants
+  const ascendantsData = answers.value.ascendants_details || {};
+
+  // Vérifier s'il n'y a aucun ascendant masculin
+  const hasNoMaleAscendants =
+      ascendantsData.father !== true &&
+      ascendantsData.paternal_grandfather !== true &&
+      ascendantsData.paternal_great_grandfather_1 !== true &&
+      ascendantsData.paternal_great_grandfather_2 !== true &&
+      ascendantsData.maternal_great_grandfather_1 !== true &&
+      ascendantsData.maternal_great_grandfather_2 !== true;
+
+  // Afficher uniquement si les deux conditions sont remplies
+  return hasNoDescendants && hasNoMaleAscendants;
+});
 
 // Commencer un nouveau questionnaire
 const startNew = () => {

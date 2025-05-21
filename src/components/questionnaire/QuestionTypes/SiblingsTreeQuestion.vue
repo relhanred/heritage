@@ -64,8 +64,8 @@
           </div>
         </div>
 
-        <!-- Côté maternel -->
-        <div class="half-sibling-column maternal">
+        <!-- Côté maternel - conditionné par l'absence de descendants et d'ascendants masculins -->
+        <div v-if="shouldShowMaternalHalfSiblings" class="half-sibling-column maternal">
           <div class="half-siblings-box">
             <h4 class="siblings-title">Demi-frères/sœurs<br>(même mère)</h4>
             <div class="siblings-inputs">
@@ -157,6 +157,21 @@ const props = defineProps({
   gender: {
     type: Boolean,
     default: true // Par défaut homme (true=homme, false=femme)
+  },
+  descendants: {
+    type: Object,
+    default: () => ({
+      sons: '0',
+      daughters: '0',
+      grandsons: '0',
+      granddaughters: '0',
+      greatGrandsons: '0',
+      greatGranddaughters: '0'
+    })
+  },
+  ascendants: {
+    type: Object,
+    default: () => ({})
   }
 });
 
@@ -167,6 +182,30 @@ const validationError = ref('');
 
 // Label du défunt selon le genre
 const deceasedLabel = computed(() => props.gender ? 'Défunt' : 'Défunte');
+
+// Vérifier si on doit afficher les demi-frères/sœurs du côté maternel
+const shouldShowMaternalHalfSiblings = computed(() => {
+  // Vérifier s'il n'y a aucun descendant
+  const hasNoDescendants =
+      (parseInt(props.descendants.sons) || 0) === 0 &&
+      (parseInt(props.descendants.daughters) || 0) === 0 &&
+      (parseInt(props.descendants.grandsons) || 0) === 0 &&
+      (parseInt(props.descendants.granddaughters) || 0) === 0 &&
+      (parseInt(props.descendants.greatGrandsons) || 0) === 0 &&
+      (parseInt(props.descendants.greatGranddaughters) || 0) === 0;
+
+  // Vérifier s'il n'y a aucun ascendant masculin
+  const hasNoMaleAscendants =
+      props.ascendants.father !== true &&
+      props.ascendants.paternal_grandfather !== true &&
+      props.ascendants.paternal_great_grandfather_1 !== true &&
+      props.ascendants.paternal_great_grandfather_2 !== true &&
+      props.ascendants.maternal_great_grandfather_1 !== true &&
+      props.ascendants.maternal_great_grandfather_2 !== true;
+
+  // Afficher uniquement si les deux conditions sont remplies
+  return hasNoDescendants && hasNoMaleAscendants;
+});
 
 // Initialiser les valeurs si nécessaire
 onMounted(() => {
@@ -186,6 +225,12 @@ onMounted(() => {
       updatedModel[prop] = updatedModel[prop].toString();
     }
   });
+
+  // Si on ne doit pas afficher les demi-frères/sœurs maternels, les mettre à 0
+  if (!shouldShowMaternalHalfSiblings.value) {
+    updatedModel.halfBrothersMother = '0';
+    updatedModel.halfSistersMother = '0';
+  }
 
   emit('update:modelValue', updatedModel);
   validateInput();
@@ -227,6 +272,17 @@ const validateInput = () => {
 
 // Observer les changements dans le modèle
 watch(() => props.modelValue, validateInput, { deep: true });
+
+// Observer les changements de shouldShowMaternalHalfSiblings
+watch(shouldShowMaternalHalfSiblings, (newValue) => {
+  if (!newValue) {
+    // Si on ne doit plus afficher les demi-frères/sœurs maternels, les réinitialiser à 0
+    const updatedModel = { ...props.modelValue };
+    updatedModel.halfBrothersMother = '0';
+    updatedModel.halfSistersMother = '0';
+    emit('update:modelValue', updatedModel);
+  }
+});
 </script>
 
 <style scoped>
